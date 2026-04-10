@@ -1,3 +1,3 @@
 <template>
-  <HeroBanner/>
+  Hier entsteht die Startseite.
 </template>

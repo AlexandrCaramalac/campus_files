@@ -4,7 +4,7 @@
     <main class="flex-grow">
       <NuxtPage />
     </main>
-
+  
     <FruitFooter/>
   </div>
 </template>

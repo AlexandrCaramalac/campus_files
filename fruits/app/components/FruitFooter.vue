@@ -6,22 +6,18 @@
         
         <!-- Left: Logo / Name -->
         <div class="text-center md:text-left">
-          <h2 class="text-xl font-semibold text-white">FruitApp</h2>
+          <h2 class="text-xl font-semibold text-white">StudySync</h2>
           <p class="text-sm text-gray-400">
-            Fresh fruits. Healthy life.
+            Hier steht ein Text.
           </p>
         </div>
 
-        <!-- Center: Navigation (nur Links, keine Buttons) -->
         <div class="flex gap-6 text-sm">
           <NuxtLink to="/" class="hover:text-white transition">Home</NuxtLink>
-          <NuxtLink to="/fruits" class="hover:text-white transition">Fruits</NuxtLink>
         </div>
 
-        <!-- Right: Info -->
         <div class="text-sm text-gray-400 text-center md:text-right">
-          <p>© 2026 FruitApp</p>
-          <p>All rights reserved</p>
+          <p>Hier steht auch ein Text.</p>
         </div>
 
       </div>
