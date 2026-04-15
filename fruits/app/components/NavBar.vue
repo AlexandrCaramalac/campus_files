@@ -13,61 +13,20 @@
         </li>
         <li class="pr-4">
           <NuxtLink 
-            to="/files" 
+            to="/courses" 
             class="text-gray-700 font-medium hover:text-green-600 transition"
           >
             Module
           </NuxtLink>
         </li>
         <li class="pr-4">
-          <NuxtLink
-              to="/forum"
-              class="text-gray-700 font-medium hover:text-green-600 transition"
+          <NuxtLink 
+            to="/ratings_prof"
+            class="text-gray-700 font-medium hover:text-green-600 transition"
           >
-            Forum
+            Dozenten
           </NuxtLink>
-        </li>
 
-        <!-- Bewertungen Dropdown -->
-        <li class="relative pr-4">
-          <button 
-            @click="toggleRatingsDropdown"
-            class="flex items-center text-gray-700 font-medium hover:text-green-600 transition"
-          >
-            Bewertungen
-            <svg 
-              class="ml-1 h-4 w-4 transition-transform" 
-              :class="{ 'rotate-180': ratingsDropdownOpen }"
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-          
-          <!-- Dropdown Menu -->
-          <div 
-            v-if="ratingsDropdownOpen"
-            class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border"
-          >
-            <div class="py-1">
-              <NuxtLink 
-                to="/ratings_prof"
-                @click="closeRatingsDropdown"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-              >
-                Dozenten
-              </NuxtLink>
-              <NuxtLink 
-                to="/ratings_course"
-                @click="closeRatingsDropdown"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-              >
-                Module
-              </NuxtLink>
-            </div>
-          </div>
         </li>
       </ul>
       
