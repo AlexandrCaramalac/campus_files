@@ -132,18 +132,20 @@ const materialien = ref([
             </div>
           </div>
 
-          <div class="p-6 mt-autobg-slate-50">
-            <textarea class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none resize-none shadow-inner" rows="3" placeholder="Stell eine Frage..."></textarea>
-            <button class="w-full mt-4 bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
-              POSTEN
-            </button>
-          </div>
+          <div class="p-6 bg-slate-50 space-y-4"> 
+            <div>
+              <textarea class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none resize-none shadow-inner" rows="3" placeholder="Stell eine Frage..."></textarea>
+              <button class="w-full mt-4 bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
+                POSTEN
+              </button>
+            </div>
 
-          <NuxtLink to="/forum" class="p-6 bg-slate-50">
-            <button class="w-full mt-4 bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
-              ALLE BEITRÄGE
-            </button>
-          </NuxtLink>
+            <NuxtLink to="/forum" class="block w-full">
+              <button class="w-full bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
+                ALLE BEITRÄGE
+              </button>
+            </NuxtLink>
+          </div>
           
         </aside>
 
