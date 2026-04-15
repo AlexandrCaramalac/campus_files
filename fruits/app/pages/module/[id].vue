@@ -10,7 +10,7 @@ const tabs = ['Altklausuren', 'Lösungen', 'Mitschriften', 'Alle Ressourcen']
 
 // Beispiel-Daten
 const modulDaten = ref({
-  id: 'INF-CS-301',
+  id: 'INF-SK-DBS6',
   name: 'Database Systems',
   dozent: 'Prof. Müller',
   beschreibung: 'An exploration of relational databases, SQL programming, database design, normalization, concurrency control, and NoSQL systems.',
