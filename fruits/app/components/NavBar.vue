@@ -5,7 +5,7 @@
       <ul class="flex items-center">
         <li class="pr-4">
           <NuxtLink 
-            to="/" 
+            to="/"
             class="text-gray-700 font-medium hover:text-green-600 transition"
           >
             Home
@@ -16,9 +16,18 @@
             to="/files" 
             class="text-gray-700 font-medium hover:text-green-600 transition"
           >
-            Dateien
+            Module
           </NuxtLink>
         </li>
+        <li class="pr-4">
+          <NuxtLink
+              to="/forum"
+              class="text-gray-700 font-medium hover:text-green-600 transition"
+          >
+            Forum
+          </NuxtLink>
+        </li>
+
         <!-- Bewertungen Dropdown -->
         <li class="relative pr-4">
           <button 
