@@ -7,5 +7,3 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error("Supabase credentials are missing. Check your environment variables.");
 }
 export const supabase = createClient(supabaseUrl, supabaseKey);
-
-

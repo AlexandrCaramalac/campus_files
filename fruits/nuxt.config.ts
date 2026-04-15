@@ -6,5 +6,7 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase'],
   supabase: {
     redirect: false,
+    url: process.env.VITE_SUPABASE_URL,
+    key: process.env.VITE_SUPABASE_ANON_KEY,
   }
 })
