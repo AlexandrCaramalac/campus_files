@@ -21,7 +21,7 @@
         </li>
         <li class="pr-4">
           <NuxtLink 
-            to="/ratings_prof"
+            to="/lecturers"
             class="text-gray-700 font-medium hover:text-green-600 transition"
           >
             Dozenten
