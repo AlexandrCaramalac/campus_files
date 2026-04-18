@@ -8,7 +8,15 @@
             to="/"
             class="text-gray-700 font-medium hover:text-green-600 transition"
           >
-            Home
+            Startseite
+          </NuxtLink>
+        </li>
+        <li class="pr-4">
+          <NuxtLink
+              to="/anleitung"
+              class="text-gray-700 font-medium hover:text-green-600 transition"
+          >
+            Anleitung
           </NuxtLink>
         </li>
         <li class="pr-4">
