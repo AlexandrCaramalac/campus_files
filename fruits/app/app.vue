@@ -5,6 +5,6 @@
       <NuxtPage />
     </main>
   
-    <FruitFooter/>
+    <Startseite/>
   </div>
 </template>
