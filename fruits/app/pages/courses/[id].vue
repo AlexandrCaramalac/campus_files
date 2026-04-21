@@ -1,21 +1,35 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const route = useRoute()
-const modulId = route.params.id
+const urlId = route.params.id // Entspricht der 'id' Spalte (z.B. 7) aus der Datenbank
+
+// Kursdaten über die bestehende API laden
+const { data } = await useFetch("/api/kurse")
+
+// Den spezifischen Kurs anhand der ID aus der URL finden
+const aktuellerKurs = computed(() => {
+  if (!data.value?.courses) return null
+  return data.value.courses.find(course => course.id.toString() === urlId)
+})
 
 // Aktiver Tab für die Materialien
 const aktiverTab = ref('Altklausuren')
 const tabs = ['Altklausuren', 'Lösungen', 'Mitschriften', 'Alle Ressourcen']
 
-// Beispiel-Daten
-const modulDaten = ref({
-  id: 'INF-SK-DBS6',
-  name: 'Database Systems',
-  dozent: 'Prof. Müller',
-  beschreibung: 'An exploration of relational databases, SQL programming, database design, normalization, concurrency control, and NoSQL systems.',
-  bewertungModul: 3.5,
-  bewertungDozent: 4.5
+// Dynamische Daten mit Platzhaltern kombinieren
+const modulDaten = computed(() => {
+  return {
+    // Dynamische Werte aus der Datenbank
+    id: aktuellerKurs.value ? aktuellerKurs.value.modul_id : 'Lädt...', 
+    name: aktuellerKurs.value ? aktuellerKurs.value.name : 'Kurs wird geladen...',
+    
+    // Vorerst statische Platzhalter
+    dozent: 'Prof. Müller',
+    beschreibung: 'An exploration of relational databases, SQL programming, database design, normalization, concurrency control, and NoSQL systems.',
+    bewertungModul: 3.5,
+    bewertungDozent: 4.5
+  }
 })
 
 const materialien = ref([
