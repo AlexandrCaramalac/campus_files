@@ -1,30 +1,36 @@
 <script setup>
+// --- LOGIK-BEREICH ---
+// Hier importiert man die benötigten Vue-Funktionen für reaktive Variablen und berechnete Werte.
 import { ref, computed } from 'vue'
 
+// 1. URL auslesen: Man holt sich die aktuelle Route, um den Parameter zu extrahieren.
 const route = useRoute()
-const urlId = route.params.id // Entspricht der 'id' Spalte (z.B. 7) aus der Datenbank
+const urlId = route.params.id // Entspricht der 'id' in der URL (z.B. /module/7 -> 7)
 
-// Kursdaten über die bestehende API laden
+// 2. Daten laden: Man fragt asynchron alle Kurse von der API ab.
 const { data } = await useFetch("/api/kurse")
 
-// Den spezifischen Kurs anhand der ID aus der URL finden
+// 3. Den passenden Kurs finden: 
+// Sobald die Daten da sind, sucht man exakt den Kurs heraus, dessen ID mit der URL übereinstimmt.
 const aktuellerKurs = computed(() => {
   if (!data.value?.courses) return null
   return data.value.courses.find(course => course.id.toString() === urlId)
 })
 
-// Aktiver Tab für die Materialien
+// 4. Tab-Steuerung:
+// 'aktiverTab' speichert, was gerade ausgewählt ist. Ändert man den Wert (Klick), passt sich die Ansicht automatisch an.
 const aktiverTab = ref('Altklausuren')
 const tabs = ['Altklausuren', 'Lösungen', 'Mitschriften', 'Alle Ressourcen']
 
-// Dynamische Daten mit Platzhaltern kombinieren
+// 5. Daten zusammenstellen:
+// Hier kombiniert man die echten API-Daten mit Platzhaltern (für noch nicht existierende Felder in der Datenbank).
 const modulDaten = computed(() => {
   return {
-    // Dynamische Werte aus der Datenbank
+    // Dynamische Werte (aus aktuellerKurs extrahiert)
     id: aktuellerKurs.value ? aktuellerKurs.value.modul_id : 'Lädt...', 
     name: aktuellerKurs.value ? aktuellerKurs.value.name : 'Kurs wird geladen...',
     
-    // Vorerst statische Platzhalter
+    // Statische Platzhalter für die visuelle Präsentation
     dozent: 'Prof. Müller',
     beschreibung: 'An exploration of relational databases, SQL programming, database design, normalization, concurrency control, and NoSQL systems.',
     bewertungModul: 3.5,
@@ -32,6 +38,7 @@ const modulDaten = computed(() => {
   }
 })
 
+// 6. Testdaten für die hochgeladenen Materialien
 const materialien = ref([
   { name: 'SS2023_Altklausur.pdf', autor: 'Ben', datum: '12.03.2026', typ: 'Altklausuren' },
   { name: 'WS2022_Prüfung.pdf', autor: 'Clara', datum: '18.01.2026', typ: 'Altklausuren' },
@@ -74,8 +81,9 @@ const materialien = ref([
               <div class="flex border-b border-slate-100 mb-6 overflow-x-auto gap-4">
                 <button 
                   v-for="tab in tabs" :key="tab"
-                  @click="aktiverTab = tab"
+                  @click="aktiverTab = tab" 
                   :class="['pb-3 font-bold text-sm transition-colors whitespace-nowrap', 
+                  /* Dynamisches CSS: Ist der Tab aktiv, bekommt er einen dicken grünen Unterstrich und grüne Schrift. */
                   aktiverTab === tab ? 'text-green-600 border-b-4 border-green-500' : 'text-slate-400 hover:text-slate-600']"
                 >
                   {{ tab.toUpperCase() }}
@@ -83,7 +91,8 @@ const materialien = ref([
               </div>
 
               <div class="space-y-4">
-                <div v-for="file in materialien.filter(m => aktiverTab === 'Alle Ressourcen' || m.typ === aktiverTab)" :key="file.name"
+                <div 
+                  v-for="file in materialien.filter(m => aktiverTab === 'Alle Ressourcen' || m.typ === aktiverTab)" :key="file.name"
                   class="flex items-center justify-between p-4 bg-slate-50 border border-transparent rounded-2xl hover:bg-green-50 hover:border-green-100 transition-colors"
                 >
                   <div class="flex items-center gap-4">
@@ -101,10 +110,12 @@ const materialien = ref([
                   </div>
                 </div>
               </div>
+
             </div>
           </section>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
             <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-lg shadow-blue-900/5 hover:border-green-200 transition-colors">
               <p class="text-sm font-bold text-slate-400 mb-2">Dozent</p>
               <p class="font-bold text-slate-800 text-lg">{{ modulDaten.dozent }}</p>
@@ -124,9 +135,11 @@ const materialien = ref([
               <p class="text-2xl font-black text-blue-900">{{ modulDaten.id }}</p>
             </div>
           </div>
+
         </div>
 
         <aside class="bg-white rounded-[2rem] shadow-xl shadow-green-900/5 border border-slate-100 flex flex-col h-fit overflow-hidden">
+          
           <div class="p-6 bg-slate-50 border-b border-slate-100 text-center">
             <h2 class="font-extrabold text-slate-700 uppercase tracking-widest text-sm">Diskussionen</h2>
           </div>
@@ -164,4 +177,4 @@ const materialien = ref([
       </div>
     </div>
   </div>
-</template>
+</template> 
