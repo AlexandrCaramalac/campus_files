@@ -1,3 +1,6 @@
+<script setup lang="ts">
+</script>
+
 <template>
   <div class="hero">
 
@@ -39,6 +42,14 @@
 .logo {
   width: 250px;
   height: auto;
+  border-radius: 18px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.logo:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.22);
+  cursor: pointer;
 }
 
 .slogan {
@@ -49,12 +60,29 @@
   z-index: 3;
 }
 
+HEAD
 /* ICONS */
+.slogan:hover {
+  transform: scale(1.05);
+  color: #aaa;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+} 
+
+/* Dauereffekt für Icons: */
 .floating {
   position: absolute;
   width: 120px;
   border-radius: 20px;
-  z-index: 1; /*damit Icons hinter dem Logo liegen*/
+  z-index: 1; /* damit Icons hinter dem Logo liegen */
+  transition: filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+/*Hover Effekt für Icons:*/
+.floating:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
 }
 
 /* Positionen der Icons leicht versetzt + eigene Bewegungen*/
