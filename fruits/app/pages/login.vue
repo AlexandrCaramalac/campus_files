@@ -148,7 +148,7 @@ async function login() {
 		showMessage(error.message, true);
 	} else {
 		showMessage("Erfolgreich eingeloggt!");
-    router.push("/dashboard");
+    router.push("/dashboard"); //nicht mehr auf der Startseite, sondern Dashboard landen
 	}
 }
 

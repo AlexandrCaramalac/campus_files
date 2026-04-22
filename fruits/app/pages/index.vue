@@ -1,3 +1,5 @@
+//Landingpage für ausgeloggte User
+
 <script setup lang="ts">
 </script>
 
@@ -49,7 +51,7 @@
 .logo:hover {
   transform: scale(1.04);
   box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.22);
-  cursor: pointer;
+  cursor: default;
 }
 
 .slogan {
@@ -65,7 +67,7 @@
   transform: scale(1.05);
   color: #aaa;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
+  cursor: default;
 }
 
 /* ICONS */
@@ -80,7 +82,7 @@
 .floating:hover {
   filter: brightness(1.1);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-  cursor: pointer;
+  cursor: default;
 }
 
 .top-left {
