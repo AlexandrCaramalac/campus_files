@@ -23,11 +23,6 @@
             Dozenten
           </NuxtLink>
         </li>
-        <li v-if="user" class="pr-4">
-          <NuxtLink to="/profil" class="text-gray-700 font-medium hover:text-green-600 transition">
-            Profil
-          </NuxtLink>
-        </li>
       </ul>
 
       <div class="flex items-center">
