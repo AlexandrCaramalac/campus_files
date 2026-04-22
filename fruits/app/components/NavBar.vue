@@ -4,7 +4,7 @@
       
       <ul class="flex items-center">
         <li class="pr-4">
-          <NuxtLink to="/" class="text-gray-700 font-medium hover:text-green-600 transition">
+          <NuxtLink :to="startseiteLink" class="text-gray-700 font-medium hover:text-green-600 transition">
             Startseite
           </NuxtLink>
         </li>
@@ -15,17 +15,12 @@
         </li>
         <li class="pr-4">
           <NuxtLink to="/courses" class="text-gray-700 font-medium hover:text-green-600 transition">
-            Module
+            Courses
           </NuxtLink>
         </li>
         <li class="pr-4">
           <NuxtLink to="/lecturers" class="text-gray-700 font-medium hover:text-green-600 transition">
             Dozenten
-          </NuxtLink>
-        </li>
-        <li v-if="user" class="pr-4">
-          <NuxtLink to="/profil" class="text-gray-700 font-medium hover:text-green-600 transition">
-            Profil
           </NuxtLink>
         </li>
       </ul>
@@ -49,7 +44,7 @@
               Profil
             </button>
           </NuxtLink>
-          
+
           <button
             @click="logout"
             class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition ml-4"
@@ -68,22 +63,27 @@ import { ref, onMounted } from 'vue'
 
 const supabase = useSupabaseClient()
 const user = ref(null)
+const startseiteLink = ref('/')
 
 // Authentifizierungsstatus beim Laden der Komponente prüfen
 onMounted(async () => {
   const { data } = await supabase.auth.getSession()
   user.value = data.session?.user ?? null
+  startseiteLink.value = data.session?.user ? '/dashboard' : '/'
 
   // Auf Änderungen des Auth-Status reagieren (Login/Logout)
+  // Wenn ein User da ist → startseiteLink = '/dashboard'
+  // Wenn kein User da ist → startseiteLink = '/'
   supabase.auth.onAuthStateChange((event, session) => {
     user.value = session?.user ?? null
+    startseiteLink.value = session?.user ? '/dashboard' : '/'
   })
 })
 
-// Logout-Funktion
 const logout = async () => {
   await supabase.auth.signOut()
   user.value = null
+  startseiteLink.value = '/'
   navigateTo('/')
 }
 

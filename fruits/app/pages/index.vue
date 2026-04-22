@@ -4,7 +4,7 @@
 <template>
   <div class="hero">
 
-    <!-- Logo mit Slogan im Zentrum -->
+    <!-- Mittlerer Bereich -->
     <div class="center">
       <img src="/StudySync_Logo.png" class="logo" />
       <p class="slogan">Study smarter. Not harder.</p>
@@ -23,18 +23,18 @@
 
 <style scoped>
 .hero {
-  position: relative;      /* WICHTIG: Bezugspunkt für alle Bilder */
-  min-height: calc(100vh - 260px); /*-260px um die Leisten oben und unten abzuziehen*/
-  background: white;     /* dunkler Hintergrund wie im Bild */
+  position: relative;
+  min-height: calc(100vh - 260px);
+  background: white;
   overflow: hidden;
 }
 
-/* MITTE/ LOGO */
+/* MITTLERER BEREICH */
 .center {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* perfekt mittig */
+  transform: translate(-50%, -50%);
   text-align: center;
   z-index: 2;
 }
@@ -58,38 +58,35 @@
   font-size: 20px;
   position: relative;
   z-index: 3;
+  transition: transform 0.25s ease, color 0.25s ease, text-shadow 0.25s ease;
 }
 
-HEAD
-/* ICONS */
 .slogan:hover {
   transform: scale(1.05);
   color: #aaa;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-} 
+}
 
-/* Dauereffekt für Icons: */
+/* ICONS */
 .floating {
   position: absolute;
   width: 120px;
   border-radius: 20px;
-  z-index: 1; /* damit Icons hinter dem Logo liegen */
+  z-index: 1;
   transition: filter 0.3s ease, box-shadow 0.3s ease;
 }
 
-/*Hover Effekt für Icons:*/
 .floating:hover {
   filter: brightness(1.1);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
   cursor: pointer;
 }
 
-/* Positionen der Icons leicht versetzt + eigene Bewegungen*/
 .top-left {
   top: 2%;
   left: 40%;
-  animation: drift-1 6.2s ease-in-out infinite; /*ease- in- out: wirkt weicher*/
+  animation: drift-1 6.2s ease-in-out infinite;
   animation-delay: 0.4s;
 }
 
@@ -131,9 +128,7 @@ HEAD
 }
 
 /* ANIMATIONEN */
-
-/* Normale Icons */
-@keyframes drift-1 { /*bewegt sich eher nach rechts*/
+@keyframes drift-1 {
   0%   { transform: translate(0px, 0px); }
   25%  { transform: translate(4px, -6px); }
   50%  { transform: translate(8px, -2px); }
@@ -141,7 +136,7 @@ HEAD
   100% { transform: translate(0px, 0px); }
 }
 
-@keyframes drift-2 { /*bewegt sich eher nach links*/
+@keyframes drift-2 {
   0%   { transform: translate(0px, 0px); }
   25%  { transform: translate(-5px, -4px); }
   50%  { transform: translate(-9px, 3px); }
@@ -149,7 +144,7 @@ HEAD
   100% { transform: translate(0px, 0px); }
 }
 
-@keyframes drift-3 { /*größere Bewegung*/
+@keyframes drift-3 {
   0%   { transform: translate(0px, 0px); }
   25%  { transform: translate(6px, -3px); }
   50%  { transform: translate(10px, 4px); }
@@ -157,7 +152,7 @@ HEAD
   100% { transform: translate(0px, 0px); }
 }
 
-@keyframes drift-4 { /*Mischung aus Bewegung nach links und unten (diagonal)*/
+@keyframes drift-4 {
   0%   { transform: translate(0px, 0px); }
   25%  { transform: translate(-4px, -5px); }
   50%  { transform: translate(-8px, 2px); }
@@ -165,7 +160,6 @@ HEAD
   100% { transform: translate(0px, 0px); }
 }
 
-/* Für die Icons, die vorher translateY(-50%) hatten */
 @keyframes drift-middle-1 {
   0%   { transform: translateY(-50%) translate(0px, 0px); }
   25%  { transform: translateY(-50%) translate(5px, -5px); }
@@ -182,46 +176,20 @@ HEAD
   100% { transform: translateY(-50%) translate(0px, 0px); }
 }
 
-/* Kleinerer Bildschirm: Icons weiter nach außen */
+/* Tablet */
 @media (max-width: 900px) {
-  .top-left {
-    left: 34%;
-  }
-
-  .top-right {
-    right: 20%;
-  }
-
-  .left {
-    left: 12%;
-  }
-
-  .right {
-    right: 12%;
-  }
-
-  .bottom-left {
-    left: 22%;
-  }
-
-  .bottom-right {
-    right: 28%;
-  }
-
-  .floating {
-    width: 100px;
-  }
-
-  .logo {
-    width: 220px;
-  }
-
-  .slogan {
-    font-size: 18px;
-  }
+  .top-left { left: 34%; }
+  .top-right { right: 20%; }
+  .left { left: 12%; }
+  .right { right: 12%; }
+  .bottom-left { left: 22%; }
+  .bottom-right { right: 28%; }
+  .floating { width: 100px; }
+  .logo { width: 220px; }
+  .slogan { font-size: 18px; }
 }
 
-/* Noch kleinerer Bildschirm z.B. Handy: noch weiter raus + kleinere Icons */
+/* Handy */
 @media (max-width: 600px) {
   .hero {
     min-height: calc(100vh - 180px);
@@ -231,58 +199,27 @@ HEAD
     top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 2;
   }
 
   .logo {
     width: 160px;
-    height: auto;
   }
 
   .slogan {
     font-size: 15px;
     margin-top: 12px;
-    position: relative;
-    z-index: 3;
     padding: 0 12px;
   }
 
   .floating {
     width: 58px;
-    z-index: 1;
   }
 
-  .top-left {
-    top: 10%;
-    left: 20%;
-  }
-
-  .top-right {
-    top: 14%;
-    right: 12%;
-  }
-
-  .left {
-    top: 34%;
-    left: 6%;
-    transform: translateY(-50%);
-  }
-
-  .right {
-    top: 42%;
-    right: 6%;
-    transform: translateY(-50%);
-  }
-
-  .bottom-left {
-    bottom: 18%;
-    left: 16%;
-  }
-
-  .bottom-right {
-    bottom: 14%;
-    right: 16%;
-  }
+  .top-left { top: 10%; left: 20%; }
+  .top-right { top: 14%; right: 12%; }
+  .left { top: 34%; left: 6%; }
+  .right { top: 42%; right: 6%; }
+  .bottom-left { bottom: 18%; left: 16%; }
+  .bottom-right { bottom: 14%; right: 16%; }
 }
-
 </style>
