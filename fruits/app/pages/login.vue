@@ -138,6 +138,7 @@ async function createAccount() {
 	}
 }
 
+//Nach einloggen auf "dashboard verlinken, damit die Startseite sich ändert
 async function login() {
 	const { data, error } = await supabase.auth.signInWithPassword({
 		email: email.value,
@@ -147,7 +148,7 @@ async function login() {
 		showMessage(error.message, true);
 	} else {
 		showMessage("Erfolgreich eingeloggt!");
-    router.push("/");
+    router.push("/dashboard"); //nicht mehr auf der Startseite, sondern Dashboard landen
 	}
 }
 
