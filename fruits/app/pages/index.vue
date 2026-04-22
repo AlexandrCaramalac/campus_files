@@ -60,7 +60,6 @@
   z-index: 3;
 }
 
-HEAD
 /* ICONS */
 .slogan:hover {
   transform: scale(1.05);

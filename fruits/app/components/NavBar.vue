@@ -15,7 +15,7 @@
         </li>
         <li class="pr-4">
           <NuxtLink to="/courses" class="text-gray-700 font-medium hover:text-green-600 transition">
-            Module
+            Kurse
           </NuxtLink>
         </li>
         <li class="pr-4">
