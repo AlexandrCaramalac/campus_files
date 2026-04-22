@@ -106,6 +106,7 @@
 <script setup>
 import { ref } from "vue";
 import { supabase } from "../clients/supabase"
+import { useRouter } from "vue-router";
 
 const mode = ref("login");
 const email = ref("");
@@ -113,6 +114,7 @@ const password = ref("");
 const firstName = ref("");
 const message = ref("");
 const isError = ref(false);
+const router = useRouter();
 
 function showMessage(text, error = false) {
 	message.value = text;
@@ -132,6 +134,7 @@ async function createAccount() {
 		showMessage(error.message, true);
 	} else {
 		showMessage("Account erstellt! Bitte E-Mail bestätigen.");
+    router.push("/login");
 	}
 }
 
@@ -144,6 +147,7 @@ async function login() {
 		showMessage(error.message, true);
 	} else {
 		showMessage("Erfolgreich eingeloggt!");
+    router.push("/");
 	}
 }
 
