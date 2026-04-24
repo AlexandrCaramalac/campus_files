@@ -10,6 +10,10 @@ const urlId = route.params.id // Entspricht der 'id' in der URL (z.B. /module/7 
 // 2. Daten laden: Man fragt asynchron alle Kurse von der API ab.
 const { data } = await useFetch("/api/kurse")
 
+// --- Demo für die Anbindung an die API, das fetch hierüber sollte damit überflüssig sein ---
+const { data: course } = await useFetch('/api/kurse/' + route.params.id)
+const { data: forums } = await useFetch('/api/kurse/foren/' + route.params.id)
+
 // 3. Den passenden Kurs finden: 
 // Sobald die Daten da sind, sucht man exakt den Kurs heraus, dessen ID mit der URL übereinstimmt.
 const aktuellerKurs = computed(() => {
@@ -60,10 +64,10 @@ const materialien = ref([
         <div class="absolute -top-20 -right-20 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
         
         <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight text-white relative z-10">
-          {{ modulDaten.name }}
+          {{ course.kurs.name }} <!-- Stattedessen so darauf zugreifen --> 
         </h1>
         <p class="mt-4 text-lg text-green-50 max-w-3xl relative z-10 font-medium leading-relaxed">
-          {{ modulDaten.beschreibung }}
+          {{ course.kurs?.beschreibung || "Keine Beschreibung verfügbar." }} <!-- Stattedessen so darauf zugreifen --> 
         </p>
       </header>
 
@@ -159,22 +163,71 @@ const materialien = ref([
             </div>
           </div>
 
-          <div class="p-6 mt-autobg-slate-50">
-            <textarea class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none resize-none shadow-inner" rows="3" placeholder="Stell eine Frage..."></textarea>
-            <button class="w-full mt-4 bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
+          <div class="p-6 mt-auto bg-slate-50 space-y-4">
+            <textarea
+              class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-sm"
+              rows="3"
+              placeholder="Stell eine Frage..."
+            ></textarea>
+
+            <button class="w-full bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
               POSTEN
             </button>
-          </div>
 
-          <NuxtLink to="/forum" class="p-6 bg-slate-50">
-            <button class="w-full mt-4 bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
-              ALLE BEITRÄGE
-            </button>
-          </NuxtLink>
+            <NuxtLink to="/forum" class="block">
+              <button class="w-full bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
+                ALLE BEITRÄGE
+              </button>
+            </NuxtLink>
+          </div>
           
         </aside>
 
       </div>
     </div>
   </div>
+
+  <h2 class="font-bold">Hier Demo-Anbindung an die (get) API
+    (bitte vorherige Version so ändern,
+    dass nicht mehr alle Kurse gefetched werden,
+    sondern nur noch der aktuelle Kurs,
+    wie in den fetch-Befehlen, die ich darunter
+    eingefügt habe):</h2>
+  <p>Bewertungen: <br>
+    Aufwand: {{ course.bewertungen?.aufwand || "Noch keine Bewertungen" }}<br>
+    Nutzen: {{ course.bewertungen?.nutzen || "Noch keine Bewertungen" }}<br>
+    Schwierigkeit: {{ course.bewertungen?.schwierigkeit || "Noch keine Bewertungen" }}<br>
+    Praxisbezug: {{ course.bewertungen?.praxisbezug || "Noch keine Bewertungen" }}<br>
+    Gesamtbewertung: {{ course.bewertungen?.gesamtbewertung || "Noch keine Bewertungen" }}<br>
+  </p>
+  <p>
+    Wird unterrichtet von / Gesamtbewertung der Dozenten:
+    <ul v-if="course.dozenten?.length > 0">
+      <li v-for="entry in course.dozenten" :key="entry.dozent.id">
+        {{ entry.dozent.vorname }} {{ entry.dozent.nachname }} - Gesamtbewertung: {{ entry.dozent.gesamtbewertung || "Noch keine Bewertungen" }}
+      </li>
+    </ul>
+    <p v-else>
+      Keine Einträge.
+    </p>
+    Es existieren folgende Forumsbeiträge zum Kurs: <br><br>
+    <ul>
+    <li v-for="item in forums.beitraege" :key="item.id">
+      {{ item.thema }} <br>
+      von {{ item.profile.name }} <br>
+      am {{ new Date(item.created_at).toLocaleDateString('de-DE', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }) }} <br>
+      <NuxtLink :to="`/courses/${route.params.id}/${item.id}`">
+        Kommentare
+      </NuxtLink> <br><br>
+    </li>
+  </ul>
+
+  </p>
+
 </template> 

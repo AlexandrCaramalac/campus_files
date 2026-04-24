@@ -15,11 +15,11 @@ const faqs = [
   },
   {
     frage: 'Wer kann Dateien hochladen?',
-    antwort: 'Jeder, der bereit ist seine Unterlagen zu teilen. Einfach den "Datei hochladen" Button nutzen.'
+    antwort: 'Jeder, der bereit ist, seine Unterlagen zu teilen. Einfach den "Datei hochladen" Button nutzen.'
   },
   {
     frage: 'Wie funktionieren die Bewertungen?',
-    antwort: 'IIn der jeweiligen Modulübersicht findest du die Gesamtbewertung eines Kurses sowie des zugehörigen Dozenten. Dozenten können zusätzlich über den Menüpunkt' +
+    antwort: 'In der jeweiligen Modulübersicht findest du die Gesamtbewertung eines Kurses sowie des zugehörigen Dozenten. Dozenten können zusätzlich über den Menüpunkt' +
         ' "Dozenten" gesucht und dort anhand eines Sternesystems bewertet werden. Ein Stern steht für die niedrigste, fünf Sterne für die höchste Bewertung. Dabei wird ' +
         'bewusst zwischen Modulen und Dozenten unterschieden, da sich Dozenten im Laufe der Zeit ändern können. Einzelne Bewertungen spiegeln stets subjektive Eindrücke ' +
         'wider, während die Gesamtbewertung einen aktuellen Überblick über die Qualität eines Kurses oder eines Dozenten geben soll.'
