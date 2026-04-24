@@ -16,7 +16,7 @@
 
         <div class="w-full flex justify-center text-sm">
           <NuxtLink
-              to="/"
+              to="/dashboard"
               class="text-sm text-gray-400 transition-all duration-300 hover:scale-105 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-teal-500 hover:to-blue-600"
           >
             © 2026 StudySync – From students, for students.
