@@ -105,8 +105,9 @@
 
 <script setup>
 import { ref } from "vue";
-import { supabase } from "../clients/supabase"
-import { useRouter } from "vue-router";
+
+const supabase = useSupabaseClient();
+const user = useSupabaseUser();
 
 const mode = ref("login");
 const email = ref("");
@@ -114,7 +115,6 @@ const password = ref("");
 const firstName = ref("");
 const message = ref("");
 const isError = ref(false);
-const router = useRouter();
 
 function showMessage(text, error = false) {
 	message.value = text;
@@ -123,7 +123,7 @@ function showMessage(text, error = false) {
 }
 
 async function createAccount() {
-	const { user, error } = await supabase.auth.signUp({
+	const { data, error } = await supabase.auth.signUp({
 		email: email.value,
 		password: password.value,
 		options: {
@@ -134,11 +134,9 @@ async function createAccount() {
 		showMessage(error.message, true);
 	} else {
 		showMessage("Account erstellt! Bitte E-Mail bestätigen.");
-    router.push("/login");
 	}
 }
 
-//Nach einloggen auf "dashboard verlinken, damit die Startseite sich ändert
 async function login() {
 	const { data, error } = await supabase.auth.signInWithPassword({
 		email: email.value,
@@ -148,14 +146,14 @@ async function login() {
 		showMessage(error.message, true);
 	} else {
 		showMessage("Erfolgreich eingeloggt!");
-    router.push("/dashboard"); //nicht mehr auf der Startseite, sondern Dashboard landen
+    await navigateTo("/dashboard");
 	}
 }
 
 async function seeUser() {
-	const localUser = await supabase.auth.getSession();
-	console.log(localUser.data.session);
-	showMessage(localUser.data.session ? "Session aktiv" : "Keine Session");
+	const { data } = await supabase.auth.getSession();
+	console.log('Aktuelle Session:', data.session);
+	showMessage(data.session ? `Session aktiv für ${data.session.user.email}` : "Keine Session");
 }
 
 async function logout() {
@@ -164,6 +162,7 @@ async function logout() {
 		showMessage(error.message, true);
 	} else {
 		showMessage("Erfolgreich ausgeloggt.");
+    await navigateTo("/login");
 	}
 }
 </script>

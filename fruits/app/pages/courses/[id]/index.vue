@@ -13,7 +13,11 @@ const { data } = await useFetch("/api/kurse")
 // --- Demo für die Anbindung an die API, das fetch hierüber sollte damit überflüssig sein ---
 const { data: course } = await useFetch('/api/kurse/' + route.params.id)
 const { data: forums } = await useFetch('/api/kurse/foren/' + route.params.id)
-
+const { data: files } = await useFetch('/api/dateien/' + route.params.id)
+const supabase = useSupabaseClient()
+const { data: { publicUrl } } = supabase.storage.from('kurs_dateien').getPublicUrl('');
+const publicUrlBase = publicUrl.endsWith('/') ? publicUrl : publicUrl + '/';
+    
 // 3. Den passenden Kurs finden: 
 // Sobald die Daten da sind, sucht man exakt den Kurs heraus, dessen ID mit der URL übereinstimmt.
 const aktuellerKurs = computed(() => {
@@ -187,47 +191,96 @@ const materialien = ref([
     </div>
   </div>
 
-  <h2 class="font-bold">Hier Demo-Anbindung an die (get) API
-    (bitte vorherige Version so ändern,
-    dass nicht mehr alle Kurse gefetched werden,
-    sondern nur noch der aktuelle Kurs,
-    wie in den fetch-Befehlen, die ich darunter
-    eingefügt habe):</h2>
-  <p>Bewertungen: <br>
+  <h2 class="font-bold">
+  Hier Demo-Anbindung an die (get) API
+  (bitte vorherige Version so ändern,
+  dass nicht mehr alle Kurse gefetched werden,
+  sondern nur noch der aktuelle Kurs,
+  wie in den fetch-Befehlen, die ich darunter
+  eingefügt habe):
+</h2>
+
+<div class="mt-4">
+  <p>
+    Bewertungen: <br>
     Aufwand: {{ course.bewertungen?.aufwand || "Noch keine Bewertungen" }}<br>
     Nutzen: {{ course.bewertungen?.nutzen || "Noch keine Bewertungen" }}<br>
     Schwierigkeit: {{ course.bewertungen?.schwierigkeit || "Noch keine Bewertungen" }}<br>
     Praxisbezug: {{ course.bewertungen?.praxisbezug || "Noch keine Bewertungen" }}<br>
-    Gesamtbewertung: {{ course.bewertungen?.gesamtbewertung || "Noch keine Bewertungen" }}<br>
+    Gesamtbewertung: {{ course.bewertungen?.gesamtbewertung || "Noch keine Bewertungen" }}
   </p>
-  <p>
-    Wird unterrichtet von / Gesamtbewertung der Dozenten:
-    <ul v-if="course.dozenten?.length > 0">
-      <li v-for="entry in course.dozenten" :key="entry.dozent.id">
-        {{ entry.dozent.vorname }} {{ entry.dozent.nachname }} - Gesamtbewertung: {{ entry.dozent.gesamtbewertung || "Noch keine Bewertungen" }}
-      </li>
-    </ul>
-    <p v-else>
-      Keine Einträge.
-    </p>
-    Es existieren folgende Forumsbeiträge zum Kurs: <br><br>
-    <ul>
-    <li v-for="item in forums.beitraege" :key="item.id">
-      {{ item.thema }} <br>
-      von {{ item.profile.name }} <br>
-      am {{ new Date(item.created_at).toLocaleDateString('de-DE', { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      }) }} <br>
-      <NuxtLink :to="`/courses/${route.params.id}/${item.id}`">
-        Kommentare
-      </NuxtLink> <br><br>
+</div>
+
+<div class="mt-6">
+  <p>Wird unterrichtet von / Gesamtbewertung der Dozenten:</p>
+
+  <ul v-if="course.dozenten?.length > 0">
+    <li v-for="entry in course.dozenten" :key="entry.dozent.id">
+      {{ entry.dozent.vorname }}
+      {{ entry.dozent.nachname }}
+      — Gesamtbewertung:
+      {{ entry.dozent.gesamtbewertung || "Noch keine Bewertungen" }}
     </li>
   </ul>
 
+  <p v-else>
+    Keine Einträge.
+  </p>
+</div>
+
+<div class="mt-6">
+  <p>Es existieren folgende Forumsbeiträge zum Kurs:</p>
+
+  <ul>
+    <li v-for="item in forums.beitraege" :key="item.id">
+      {{ item.thema }} <br>
+
+      von {{ item.profile.name }} <br>
+
+      am {{
+        new Date(item.created_at).toLocaleDateString('de-DE', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      }}
+      <br>
+
+      <NuxtLink :to="`/courses/${route.params.id}/${item.id}`">
+        Kommentare
+      </NuxtLink>
+
+      <br><br>
+    </li>
+  </ul>
+</div>
+
+<div class="mt-6">
+  <p>
+    Es existieren folgende Dateien in diesem Kurs
+    (bei Datenbanksysteme existiert eine Beispieldatei):
   </p>
 
+  <ul>
+    <li v-for="item in files.dateien" :key="item.id">
+      {{ item.typ }}: {{ item.dateiname }}
+
+      <a
+        :href="`${publicUrlBase}${item.dateipfad}`"
+      >
+        Anzeigen
+      </a>
+
+      <a
+        :href="`${publicUrlBase}${item.dateipfad}?download=${item.dateiname}`"
+        :download="item.dateiname"
+      >
+        Download
+      </a>
+    </li>
+  </ul>
+</div>
+  
 </template> 

@@ -1,7 +1,7 @@
 import { serverSupabaseClient } from "#supabase/server"
 
 /**
- * returns all forums for a given course aswell as date and name of the user that created the forum
+ * returns all forums for a given course aswell as date of the forum
  * also returns the display name of the user that created the forum using the profile table in supabase
  * sorted by date in descending order
  */
