@@ -3,6 +3,8 @@
     
     const { data: comments } = await useFetch('/api/kurse/foren/kommentare/' + route.params.forumId)
 
+    
+
 </script>
 
 <template> 
