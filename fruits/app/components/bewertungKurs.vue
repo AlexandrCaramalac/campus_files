@@ -62,7 +62,7 @@ const speichern = async () => {
       <!-- Aufwand -->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
-          <span>Aufwand</span>
+          <span>Aufwand (1★ = Viel Aufwand)</span>
           <span class="text-blue-600">{{ aufwand}}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="aufwand" 
@@ -72,7 +72,7 @@ const speichern = async () => {
       <!-- Nutzen -->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
-          <span>Nutzen</span>
+          <span>Nutzen (5★ = Hoher Nutzen)</span>
           <span class="text-blue-600">{{ nutzen }}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="nutzen" 
@@ -82,7 +82,7 @@ const speichern = async () => {
       <!-- Schwierigkeit -->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
-          <span>Schwierigkeit</span>
+          <span>Schwierigkeit (1★ = Hohe Schwierigkeit)</span>
           <span class="text-blue-600">{{ schwierigkeit}}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="schwierigkeit" 
@@ -92,7 +92,7 @@ const speichern = async () => {
       <!-- Praxisbezug -->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
-          <span>Praxisbezug</span>
+          <span>Praxisbezug (5★ = Hoher Praxisbezug)</span>
           <span class="text-blue-600">{{ praxisbezug}}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="praxisbezug" 
@@ -102,7 +102,7 @@ const speichern = async () => {
       <!-- MANUELLE GESAMTBEWERTUNG -->
       <div class="pt-6 border-t border-slate-100">
         <label class="flex justify-between text-lg font-black text-slate-800 mb-3">
-          <span>Gesamtbewertung</span>
+          <span>Gesamtbewertung </span>
           <span class="text-amber-500">{{ gesamt}} ★</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="gesamt" 

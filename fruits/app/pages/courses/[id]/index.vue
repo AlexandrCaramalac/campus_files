@@ -305,64 +305,7 @@ const generiereSterne = (wert) => {
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto p-4 md:p-8">
-      <h2 class="font-bold text-xl mb-4">API Daten-Übersicht</h2>
-
-      <div class="mt-4 bg-white p-6 rounded-2xl shadow">
-        <h3 class="font-bold mb-2">Bewertungen</h3>
-        <p>
-          Aufwand: {{ course?.bewertungen?.aufwand || "Noch keine Bewertungen" }}<br>
-          Nutzen: {{ course?.bewertungen?.nutzen || "Noch keine Bewertungen" }}<br>
-          Schwierigkeit: {{ course?.bewertungen?.schwierigkeit || "Noch keine Bewertungen" }}<br>
-          Praxisbezug: {{ course?.bewertungen?.praxisbezug || "Noch keine Bewertungen" }}<br>
-          Gesamtbewertung: {{ course?.bewertungen?.gesamtbewertung || "Noch keine Bewertungen" }}
-        </p>
-      </div>
-
-      <div class="mt-6 bg-white p-6 rounded-2xl shadow">
-        <h3 class="font-bold mb-2">Dozenten</h3>
-        <ul v-if="course?.dozenten?.length > 0">
-          <li v-for="entry in course.dozenten" :key="entry.dozent.id">
-            {{ entry.dozent.vorname }} {{ entry.dozent.nachname }} 
-            — Gesamtbewertung: {{ entry.dozent.gesamtbewertung || "Noch keine Bewertungen" }}
-          </li>
-        </ul>
-        <p v-else>Keine Einträge.</p>
-      </div>
-
-      <div class="mt-6 bg-white p-6 rounded-2xl shadow">
-        <h3 class="font-bold mb-2">Forumsbeiträge</h3>
-        <ul v-if="forums?.beitraege?.length > 0" class="space-y-4">
-          <li v-for="item in forums.beitraege" :key="item.id" class="border-b pb-4">
-            <span class="font-semibold">{{ item.thema }}</span> <br>
-            <span class="text-sm text-slate-500">von {{ item.profile.name }} am 
-              {{ new Date(item.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}
-            </span>
-            <br>
-            <NuxtLink :to="`/courses/${route.params.id}/${item.id}`" class="text-blue-600 hover:underline text-sm mt-2 inline-block">
-              Kommentare ansehen
-            </NuxtLink>
-          </li>
-        </ul>
-        <p v-else>Keine Beiträge vorhanden.</p>
-      </div>
-
-      <div class="mt-6 bg-white p-6 rounded-2xl shadow">
-        <h3 class="font-bold mb-2">Dateien in diesem Kurs</h3>
-        <ul v-if="files?.dateien?.length > 0" class="space-y-2">
-          <li v-for="item in files.dateien" :key="item.id" class="flex gap-4 items-center">
-            <span>{{ item.typ }}: {{ item.dateiname }}</span>
-            <a :href="`${publicUrlBase}${item.dateipfad}`" class="text-blue-600 hover:underline text-sm" target="_blank">
-              Anzeigen
-            </a>
-            <a :href="`${publicUrlBase}${item.dateipfad}?download=${item.dateiname}`" :download="item.dateiname" class="text-green-600 hover:underline text-sm">
-              Download
-            </a>
-          </li>
-        </ul>
-        <p v-else>Keine Dateien vorhanden.</p>
-      </div>
-    </div>
+ 
     <!-- MODAL: Kurs bewerten -->
   <div v-if="zeigeKursBewertung" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <!-- Hier wird die Komponente aufgerufen. Man übergibt die kursId und lauscht auf die Events. -->
