@@ -165,39 +165,31 @@ const generiereSterne = (wert) => {
                 </div>
 
                 <div class="space-y-4">
-                  <div 
-                    v-for="file in materialien.filter(m => aktiverTab === 'Alle Ressourcen' || m.typ === aktiverTab)" :key="file.name"
+                  <div
+                    v-for="file in materialien.filter(m => aktiverTab === 'Alle Ressourcen' || m.typ === aktiverTab)" :key="file.id"
                     class="flex items-center justify-between p-4 bg-slate-50 border border-transparent rounded-2xl hover:bg-green-50 hover:border-green-100 transition-colors"
                   >
-                    <div class="flex items-center gap-4">
-                      <div class="w-12 h-12 flex items-center justify-center bg-white text-green-500 rounded-full shadow-sm text-xl">
+                    <NuxtLink
+                      :to="`/courses/${urlId}/dateien/${file.id}`"
+                      class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer"
+                    >
+                      <div class="w-12 h-12 flex items-center justify-center bg-white text-green-500 rounded-full shadow-sm text-xl flex-shrink-0">
                         📄
                       </div>
-                      <div>
-                        <p class="font-bold text-slate-800">{{ file.name }}</p>
+                      <div class="min-w-0">
+                        <p class="font-bold text-slate-800 truncate">{{ file.name }}</p>
                         <p class="text-xs text-slate-500 font-medium">Uploaded by {{ file.autor }}, {{ file.datum }}</p>
                       </div>
-                    </div>
-                    <!-- Bisheriger Code (die zwei leeren Buttons) -->
-                    <div class="flex gap-2">
-                      <!-- ANSEHEN (öffnet in neuem Tab) -->
-                      <a 
-                        :href="file.urlAnsehen" 
-                        target="_blank" 
-                        class="p-2 text-slate-400 hover:text-green-500 transition-colors" 
-                        title="Ansehen">
-                        📋
-                      </a>
-                      
-                      <!-- DOWNLOAD (erzwingt das Herunterladen) -->
-                      <a 
-                        :href="file.urlDownload" 
-                        :download="file.name" 
-                        class="p-2 text-slate-400 hover:text-blue-500 transition-colors" 
-                        title="Herunterladen">
-                        📥
-                      </a>
-                    </div>
+                    </NuxtLink>
+
+                    <!-- DOWNLOAD (erzwingt das Herunterladen) -->
+                    <a
+                      :href="file.urlDownload"
+                      :download="file.name"
+                      class="ml-4 p-2 text-slate-400 hover:text-blue-500 transition-colors flex-shrink-0"
+                      title="Herunterladen">
+                      📥
+                    </a>
                   </div>
                 </div>
 
