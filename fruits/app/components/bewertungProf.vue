@@ -18,7 +18,7 @@ const verstaendlichkeit = ref(3)
 const struktur = ref(3)
 const engagement = ref(3)
 const freundlichkeit = ref(3)
-const gesamt = ref(3) // Vorher automatisch, jetzt manuell
+const gesamt = ref(3)
 
 const isLoading = ref(false)
 
@@ -34,7 +34,7 @@ const speichern = async () => {
     .from('bewertung_dozent')
     .insert({
       dozentID: props.dozentId,
-      nutzerID: user.value.sub, // <--- HIER IST DIE MAGIE! sub statt id!
+      nutzerID: user.value.sub,
       verstaendlichkeit: verstaendlichkeit.value,
       struktur: struktur.value,
       engagement: engagement.value,

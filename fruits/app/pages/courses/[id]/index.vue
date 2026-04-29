@@ -88,12 +88,34 @@ const materialien = computed(() => {
   })
 })
 
-  // Hilfsfunktion: Wandelt eine Zahl (0-5) in Sterne um
-      const generiereSterne = (wert) => {
-          if (!wert || isNaN(wert)) return '☆☆☆☆☆';
-          const gerundet = Math.round(wert); // z.B. 3.5 wird zu 4 Sternen
-          return '★'.repeat(gerundet) + '☆'.repeat(5 - gerundet);
-      }
+  // Hilfsfunktion: Wandelt eine Zahl (0-5) in volle, halbe und leere Sterne um
+const generiereSterne = (wert) => {
+  if (!wert || isNaN(wert)) return '☆☆☆☆☆';
+
+  // Wir runden auf den nächsten halben Wert (z.B. 3.2 -> 3.0, 3.3 -> 3.5, 3.8 -> 4.0)
+  const gerundet = Math.round(wert * 2) / 2;
+  
+  const volleSterne = Math.floor(gerundet); // Ganze Zahl vor dem Komma
+  const hatHalbenStern = gerundet % 1 !== 0; // Wahr, wenn es z.B. 3.5 ist
+  const leereSterne = 5 - Math.ceil(gerundet); // Der Rest auf 5
+
+  let sterneText = '';
+
+  // 1. Volle Sterne hinzufügen
+  sterneText += '★'.repeat(volleSterne);
+
+  // 2. Halben Stern hinzufügen (falls nötig)
+  if (hatHalbenStern) {
+    // Alternativen für den halben Stern: '⯨' oder '⯪' oder ein halbes SVG.
+    // Wir nutzen hier ein gängiges Unicode-Zeichen.
+    sterneText += '⯨'; 
+  }
+
+  // 3. Leere Sterne auffüllen
+  sterneText += '☆'.repeat(leereSterne);
+
+  return sterneText;
+}
   </script>
 
   <template>

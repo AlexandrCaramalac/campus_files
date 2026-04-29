@@ -13,12 +13,12 @@ const emit = defineEmits(['gespeichert', 'abbrechen'])
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-// Alle Kriterien sind jetzt manuell einstellbar, inklusive Gesamtbewertung
+// Alle Kriterien sind manuell einstellbar, inklusive Gesamtbewertung
 const aufwand = ref(3)
 const nutzen = ref(3)
 const schwierigkeit = ref(3)
 const praxisbezug = ref(3)
-const gesamt = ref(3) // Vorher automatisch, jetzt manuell
+const gesamt = ref(3)
 
 const isLoading = ref(false)
 
@@ -33,7 +33,7 @@ const speichern = async () => {
   const { error } = await supabase
     .from('bewertung_kurs') // <-- Richtige Tabelle für den Kurs
     .insert({
-      kursID: props.kursId,        // <-- WICHTIG: Bitte prüfen, ob die Spalte in Supabase wirklich 'kursID' heißt!
+      kursID: props.kursId,       
       nutzerID: user.value.sub,    // <-- HIER AUCH DIE LÖSUNG: .sub statt .id nutzen!
       aufwand: aufwand.value,
       nutzen: nutzen.value,
