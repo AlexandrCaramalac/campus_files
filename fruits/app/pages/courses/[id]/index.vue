@@ -165,6 +165,16 @@ const generiereSterne = (wert) => {
                 </div>
 
                 <div class="space-y-4">
+                  
+                  <!-- NEU: Meldung, wenn die Liste nach dem Filtern leer ist -->
+                  <div 
+                    v-if="materialien.filter(m => aktiverTab === 'Alle Ressourcen' || m.typ === aktiverTab).length === 0" 
+                    class="p-8 text-center text-slate-400 font-medium bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200"
+                  >
+                    Noch keine Dateien in dieser Kategorie vorhanden.
+                  </div>
+
+                  <!-- BESTEHEND: Die normale Schleife für vorhandene Dateien -->
                   <div
                     v-for="file in materialien.filter(m => aktiverTab === 'Alle Ressourcen' || m.typ === aktiverTab)" :key="file.id"
                     class="flex items-center justify-between p-4 bg-slate-50 border border-transparent rounded-2xl hover:bg-green-50 hover:border-green-100 transition-colors"
@@ -191,6 +201,7 @@ const generiereSterne = (wert) => {
                       📥
                     </a>
                   </div>
+                  
                 </div>
 
               </div>

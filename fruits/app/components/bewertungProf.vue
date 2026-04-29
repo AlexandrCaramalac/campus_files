@@ -63,9 +63,9 @@ const speichern = async () => {
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
           <span>Verständlichkeit</span>
-          <span class="text-green-600">{{ verstaendlichkeit.toFixed(1) }}</span>
+          <span class="text-green-600">{{ verstaendlichkeit}}</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="verstaendlichkeit" 
+        <input type="range" min="1" max="5" step="1" v-model.number="verstaendlichkeit" 
           class="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-green-600">
       </div>
       
@@ -73,9 +73,9 @@ const speichern = async () => {
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
           <span>Struktur</span>
-          <span class="text-green-600">{{ struktur.toFixed(1) }}</span>
+          <span class="text-green-600">{{ struktur}}</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="struktur" 
+        <input type="range" min="1" max="5" step="1" v-model.number="struktur" 
           class="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-green-600">
       </div>
 
@@ -83,9 +83,9 @@ const speichern = async () => {
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
           <span>Engagement</span>
-          <span class="text-green-600">{{ engagement.toFixed(1) }}</span>
+          <span class="text-green-600">{{ engagement }}</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="engagement" 
+        <input type="range" min="1" max="5" step="1" v-model.number="engagement" 
           class="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-green-600">
       </div>
 
@@ -93,9 +93,9 @@ const speichern = async () => {
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
           <span>Freundlichkeit</span>
-          <span class="text-green-600">{{ freundlichkeit.toFixed(1) }}</span>
+          <span class="text-green-600">{{ freundlichkeit }}</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="freundlichkeit" 
+        <input type="range" min="1" max="5" step="1" v-model.number="freundlichkeit" 
           class="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-green-600">
       </div>
 
@@ -103,9 +103,9 @@ const speichern = async () => {
       <div class="pt-6 border-t border-slate-100">
         <label class="flex justify-between text-lg font-black text-slate-800 mb-3">
           <span>Gesamtbewertung</span>
-          <span class="text-amber-500">{{ gesamt.toFixed(1) }} ★</span>
+          <span class="text-amber-500">{{ gesamt}} ★</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="gesamt" 
+        <input type="range" min="1" max="5" step="1" v-model.number="gesamt" 
           class="w-full h-5 bg-amber-100 rounded-lg appearance-none cursor-pointer accent-amber-500">
       </div>
 

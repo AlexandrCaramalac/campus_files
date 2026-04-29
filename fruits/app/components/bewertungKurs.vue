@@ -63,9 +63,9 @@ const speichern = async () => {
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
           <span>Aufwand</span>
-          <span class="text-blue-600">{{ aufwand.toFixed(1) }}</span>
+          <span class="text-blue-600">{{ aufwand}}</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="aufwand" 
+        <input type="range" min="1" max="5" step="1" v-model.number="aufwand" 
           class="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
       </div>
       
@@ -73,9 +73,9 @@ const speichern = async () => {
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
           <span>Nutzen</span>
-          <span class="text-blue-600">{{ nutzen.toFixed(1) }}</span>
+          <span class="text-blue-600">{{ nutzen }}</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="nutzen" 
+        <input type="range" min="1" max="5" step="1" v-model.number="nutzen" 
           class="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
       </div>
 
@@ -83,9 +83,9 @@ const speichern = async () => {
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
           <span>Schwierigkeit</span>
-          <span class="text-blue-600">{{ schwierigkeit.toFixed(1) }}</span>
+          <span class="text-blue-600">{{ schwierigkeit}}</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="schwierigkeit" 
+        <input type="range" min="1" max="5" step="1" v-model.number="schwierigkeit" 
           class="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
       </div>
 
@@ -93,9 +93,9 @@ const speichern = async () => {
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 mb-3">
           <span>Praxisbezug</span>
-          <span class="text-blue-600">{{ praxisbezug.toFixed(1) }}</span>
+          <span class="text-blue-600">{{ praxisbezug}}</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="praxisbezug" 
+        <input type="range" min="1" max="5" step="1" v-model.number="praxisbezug" 
           class="w-full h-4 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
       </div>
 
@@ -103,9 +103,9 @@ const speichern = async () => {
       <div class="pt-6 border-t border-slate-100">
         <label class="flex justify-between text-lg font-black text-slate-800 mb-3">
           <span>Gesamtbewertung</span>
-          <span class="text-amber-500">{{ gesamt.toFixed(1) }} ★</span>
+          <span class="text-amber-500">{{ gesamt}} ★</span>
         </label>
-        <input type="range" min="1" max="5" step="0.5" v-model.number="gesamt" 
+        <input type="range" min="1" max="5" step="1" v-model.number="gesamt" 
           class="w-full h-5 bg-amber-100 rounded-lg appearance-none cursor-pointer accent-amber-500">
       </div>
 
