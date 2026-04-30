@@ -1,29 +1,47 @@
-//Landingpage für ausgeloggte User
+// Landingpage für ausgeloggte User
 
 <script setup lang="ts">
+/*
+  Klick auf das Logo: User wird zur Login-Seite weitergeleitet.
+*/
 const goToLogin = () => {
   navigateTo('/login')
 }
 </script>
 
 <template>
-  <div class="hero">
+  <!--
+    Darkmode-Test:
+    - Lightmode: weißer Hintergrund
+    - Darkmode: schwarzer Hintergrund
+    - transition-colors: weicher Wechsel
+  -->
+  <div class="hero bg-white dark:bg-black transition-colors duration-300">
 
     <!-- Mittlerer Bereich -->
     <div class="center">
       <img
-          src="/StudySync_Logo.png"
+          src="/StudySync_Logo1.png"
           class="logo"
           @click="goToLogin"
+          alt="StudySync Logo"
       />
-      <p class="slogan">Study smarter. Not harder.</p>
+
+      <!-- Slogan mit eigener Light-/Darkmode-Farbe -->
+      <p class="slogan text-gray-300 dark:text-gray-600">
+        Study smarter. Not harder.
+      </p>
     </div>
 
-    <!-- Icons drumherum -->
+    <!--
+      Icons drumherum:
+      Wichtig:
+      Hier keine dark:brightness-Klassen, damit keine grauen Kästen entstehen.
+    -->
     <img src="/icon1.png" class="floating top-left" title="Teile Lernmaterialien mit anderen Studierenden!" />
     <img src="/icon7.png" class="floating top-right" title="Finde die besten Zusammenfassungen!" />
     <img src="/icon3.png" class="floating left" title="Bewerte Kurse und Dozenten!" />
-    <img src="/icon4.png" class="floating right" title="Diskutiere im Forum!" />
+    <img src="/icon2.png" class="floating right" title="Diskutiere im Forum!" />
     <img src="/icon5.png" class="floating bottom-left" title="Lerne effizienter mit StudySync!" />
     <img src="/icon6.png" class="floating bottom-right" title="Wusstest du, dass der Master Nils Burger nach dem Erfinder der SWOSY App benannt ist?" />
 
@@ -34,7 +52,14 @@ const goToLogin = () => {
 .hero {
   position: relative;
   min-height: calc(100vh - 260px);
-  background: white;
+
+  /*
+    Kein background: white; mehr.
+    Der Hintergrund wird über Tailwind gesteuert:
+    bg-white dark:bg-black
+  */
+  background: transparent;
+
   overflow: hidden;
 }
 
@@ -43,7 +68,7 @@ const goToLogin = () => {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -55%);
   text-align: center;
   z-index: 2;
 }
@@ -57,13 +82,12 @@ const goToLogin = () => {
 
 .logo:hover {
   transform: scale(1.04);
-  box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.22);
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.25);
   cursor: pointer;
 }
 
 .slogan {
-  margin-top: 20px;
-  color: #ccc;
+  margin-top: 0px;
   font-size: 20px;
   position: relative;
   z-index: 3;
@@ -73,7 +97,7 @@ const goToLogin = () => {
 .slogan:hover {
   transform: scale(1.05);
   color: #aaa;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   cursor: default;
 }
 
@@ -84,6 +108,7 @@ const goToLogin = () => {
   border-radius: 20px;
   z-index: 1;
   transition: filter 0.3s ease, box-shadow 0.3s ease;
+  background: transparent;
 }
 
 .floating:hover {
@@ -107,7 +132,7 @@ const goToLogin = () => {
 }
 
 .left {
-  top: 30%;
+  top: 40%;
   left: 22%;
   transform: translateY(-50%);
   animation: drift-middle-1 6.8s ease-in-out infinite;
@@ -123,14 +148,14 @@ const goToLogin = () => {
 }
 
 .bottom-left {
-  bottom: 25%;
-  left: 27%;
+  bottom: 15%;
+  left: 30%;
   animation: drift-3 6.5s ease-in-out infinite;
   animation-delay: 0.7s;
 }
 
 .bottom-right {
-  bottom: 10%;
+  bottom: 5%;
   right: 32%;
   animation: drift-4 7.3s ease-in-out infinite;
   animation-delay: 1.1s;

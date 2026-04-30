@@ -71,20 +71,30 @@ const latestUpdates = [
 </script>
 
 <template>
-  <div class="min-h-[calc(100vh-260px)] flex items-center justify-center bg-slate-50 font-sans text-slate-800 px-6 py-6">
+  <!--
+    Hauptbereich Dashboard:
+    Lightmode: heller Hintergrund
+    Darkmode: schwarzer Hintergrund + helle Schrift
+  -->
+  <div
+      class="min-h-[calc(100vh-260px)] flex items-center justify-center
+           bg-slate-50 dark:bg-black
+           font-sans text-slate-800 dark:text-gray-100
+           px-6 py-6 transition-colors duration-300"
+  >
     <div class="w-full max-w-4xl">
 
       <!-- Begrüßungsbereich -->
       <div class="mb-6 ml-2">
-        <h1 class="text-3xl font-black uppercase tracking-tight text-slate-800 mb-3">
+        <h1 class="text-3xl font-black uppercase tracking-tight text-slate-800 dark:text-gray-100 mb-3">
           Willkommen zurück!
         </h1>
 
-        <p class="text-lg font-semibold text-teal-700 mb-1">
+        <p class="text-lg font-semibold text-teal-700 dark:text-teal-400 mb-1">
           Schön, dass du wieder bei StudySync bist.
         </p>
 
-        <p class="text-slate-500">
+        <p class="text-slate-500 dark:text-gray-400">
           Tausche dich mit anderen Studierenden aus, finde Materialien und entdecke neue Inhalte.
         </p>
       </div>
@@ -96,7 +106,14 @@ const latestUpdates = [
             @keyup.enter="handleEnter"
             type="text"
             placeholder="Kurse suchen..."
-            class="w-full px-6 py-4 rounded-2xl border border-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white"
+            class="w-full px-6 py-4 rounded-2xl
+                 border border-slate-200 dark:border-gray-700
+                 shadow-sm
+                 focus:outline-none focus:ring-2 focus:ring-teal-400
+                 bg-white dark:bg-gray-900
+                 text-slate-800 dark:text-gray-100
+                 placeholder:text-slate-400 dark:placeholder:text-gray-500
+                 transition-colors duration-300"
         />
 
         <ul
@@ -106,17 +123,37 @@ const latestUpdates = [
           <li
               v-for="course in suggestions"
               :key="course.id"
-              class="group bg-white border border-slate-100 p-2 rounded-[2rem] shadow-md shadow-blue-900/5 hover:shadow-xl hover:shadow-teal-900/10 hover:border-teal-200 transition-all duration-300 transform hover:-translate-y-1"
+              class="group bg-white dark:bg-gray-900
+                   border border-slate-100 dark:border-gray-700
+                   p-2 rounded-[2rem]
+                   shadow-md shadow-blue-900/5 dark:shadow-black/40
+                   hover:shadow-xl hover:shadow-teal-900/10
+                   hover:border-teal-200 dark:hover:border-teal-500
+                   transition-all duration-300 transform hover:-translate-y-1"
           >
             <button
                 @click="goToCourse(course.id)"
                 class="flex items-center justify-between p-4 w-full cursor-pointer text-left"
             >
-              <h2 class="text-xl md:text-2xl font-bold text-slate-700 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-teal-500 group-hover:to-blue-600 transition-all duration-300">
+              <h2
+                  class="text-xl md:text-2xl font-bold
+                       text-slate-700 dark:text-gray-100
+                       group-hover:text-transparent group-hover:bg-clip-text
+                       group-hover:bg-gradient-to-r group-hover:from-teal-500 group-hover:to-blue-600
+                       dark:group-hover:from-teal-400 dark:group-hover:to-blue-500
+                       transition-all duration-300"
+              >
                 {{ course.name }}
               </h2>
 
-              <div class="w-12 h-12 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 group-hover:bg-gradient-to-r group-hover:from-teal-400 group-hover:to-blue-500 group-hover:text-white transition-all duration-300 shadow-sm">
+              <div
+                  class="w-12 h-12 flex items-center justify-center rounded-full
+                       bg-slate-50 dark:bg-gray-800
+                       text-slate-400 dark:text-gray-400
+                       group-hover:bg-gradient-to-r group-hover:from-teal-400 group-hover:to-blue-500
+                       group-hover:text-white
+                       transition-all duration-300 shadow-sm"
+              >
                 <span class="text-2xl leading-none">&rarr;</span>
               </div>
             </button>
@@ -126,7 +163,7 @@ const latestUpdates = [
 
       <!-- Neueste Updates -->
       <div>
-        <h2 class="text-2xl font-black uppercase tracking-tight text-slate-800 mb-4 ml-2">
+        <h2 class="text-2xl font-black uppercase tracking-tight text-slate-800 dark:text-gray-100 mb-4 ml-2">
           Neueste Updates
         </h2>
 
@@ -137,25 +174,51 @@ const latestUpdates = [
               v-for="update in latestUpdates"
               :key="update.id"
               :to="update.link"
-              class="group block bg-white border border-slate-100 p-4 rounded-[2rem] shadow-md shadow-blue-900/5 hover:shadow-xl hover:shadow-teal-900/10 hover:border-teal-200 transition-all duration-300 transform hover:-translate-y-1"
+              class="group block
+                   bg-white dark:bg-gray-900
+                   border border-slate-100 dark:border-gray-700
+                   p-4 rounded-[2rem]
+                   shadow-md shadow-blue-900/5 dark:shadow-black/40
+                   hover:shadow-xl hover:shadow-teal-900/10
+                   hover:border-teal-200 dark:hover:border-teal-500
+                   transition-all duration-300 transform hover:-translate-y-1"
           >
             <div class="flex items-center justify-between gap-4">
 
               <div>
-          <span class="inline-block mb-2 px-3 py-1 rounded-full bg-teal-50 text-teal-700 text-sm font-bold">
-            {{ update.type }}
-          </span>
+                <span
+                    class="inline-block mb-2 px-3 py-1 rounded-full
+                         bg-teal-50 dark:bg-teal-900/30
+                         text-teal-700 dark:text-teal-300
+                         text-sm font-bold"
+                >
+                  {{ update.type }}
+                </span>
 
-                <h3 class="text-lg font-bold text-slate-700 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-teal-500 group-hover:to-blue-600 transition-all duration-300">
+                <h3
+                    class="text-lg font-bold
+                         text-slate-700 dark:text-gray-100
+                         group-hover:text-transparent group-hover:bg-clip-text
+                         group-hover:bg-gradient-to-r group-hover:from-teal-500 group-hover:to-blue-600
+                         dark:group-hover:from-teal-400 dark:group-hover:to-blue-500
+                         transition-all duration-300"
+                >
                   {{ update.title }}
                 </h3>
 
-                <p class="text-slate-500 mt-1">
+                <p class="text-slate-500 dark:text-gray-400 mt-1">
                   {{ update.description }}
                 </p>
               </div>
 
-              <div class="w-11 h-11 shrink-0 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 group-hover:bg-gradient-to-r group-hover:from-teal-400 group-hover:to-blue-500 group-hover:text-white transition-all duration-300 shadow-sm">
+              <div
+                  class="w-11 h-11 shrink-0 flex items-center justify-center rounded-full
+                       bg-slate-50 dark:bg-gray-800
+                       text-slate-400 dark:text-gray-400
+                       group-hover:bg-gradient-to-r group-hover:from-teal-400 group-hover:to-blue-500
+                       group-hover:text-white
+                       transition-all duration-300 shadow-sm"
+              >
                 <span class="text-2xl leading-none">&rarr;</span>
               </div>
 
