@@ -8,6 +8,8 @@ const newPassword = ref("")
 const confirmPassword = ref("")
 const message = ref("")
 const errorMessage = ref("")
+const user = useSupabaseUser()
+const currentAvatar = ref("")
 
 const avatars = [
   "/avatars/affe.png",
@@ -17,17 +19,48 @@ const avatars = [
   "/avatars/tiger.png"
 ]
 
-const saveAvatar = () => {
+const saveAvatar = async () => {
   message.value = ""
   errorMessage.value = ""
+
+  if (!user.value) return
 
   if (!selectedAvatar.value) {
     errorMessage.value = "Bitte wähle zuerst ein Profilbild aus."
     return
   }
 
-  message.value = "Profilbild wurde ausgewählt."
+  const avatarName = selectedAvatar.value.split("/").pop()?.replace(".png", "")
+  const { error } = await supabase
+    .from("profile")
+    .update({ avatar: avatarName } ) 
+    .eq("id", user.value.id)
+
+  if (error) {
+    errorMessage.value = "Profilbild konnte nicht gespeichert werden."
+    console.error(error)
+    return
+  }
+
+  currentAvatar.value = selectedAvatar.value
+  message.value = "Profilbild wurde gespeichert."
 }
+
+onMounted(async () => {
+
+  if (!user.value) 
+    console.log("kein user")
+  return
+  const { data, error } = await supabase
+    .from("profile")
+    .select("avatar")
+    .eq("id", user.value.id)
+    .single()
+
+  if (data?.avatar) {
+    currentAvatar.value = `/avatars/${data.avatar}.png`
+  }
+})
 
 const changePassword = async () => {
   message.value = ""
@@ -72,6 +105,17 @@ const changePassword = async () => {
       <h1 class="text-4xl font-black uppercase tracking-tight text-slate-800 mb-8 ml-2">
         Mein Profil
       </h1>
+      <div class="flex items-center gap-6 mb-8 ml-2">
+        <img
+          :src="currentAvatar || '/avatars/affe.png'"
+          alt="Profilbild"
+          class="w-24 h-24 rounded-full object-cover border-4 border-teal-400 shadow"
+        />
+
+        <div>
+          <p class="text-slate-500">Dein aktuelles Profilbild</p>
+        </div>
+      </div>
 
       <div class="space-y-8">
         <section class="bg-white border border-slate-100 rounded-[2rem] p-8 shadow-md shadow-blue-900/5">
