@@ -180,7 +180,7 @@ const generiereSterne = (wert) => {
                     class="flex items-center justify-between p-4 bg-slate-50 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-2xl hover:bg-green-50 dark:hover:bg-gray-700 hover:border-green-100 dark:hover:border-green-500 transition-colors"
                 >
                   <NuxtLink
-                      :to="`/courses/${urlId}/dateien/${file.id}`"
+                      :to="`/courses/${urlId}/files/${file.id}`"
                       class="flex items-center gap-4 flex-1 min-w-0 cursor-pointer"
                   >
                     <div class="w-12 h-12 flex items-center justify-center bg-white dark:bg-gray-900 text-green-500 dark:text-green-400 rounded-full shadow-sm text-xl flex-shrink-0">
