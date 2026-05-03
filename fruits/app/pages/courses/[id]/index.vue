@@ -6,7 +6,7 @@ import { ref, computed } from 'vue'
 const route = useRoute()
 const urlId = route.params.id
 
-// 2. Daten laden: Man fragt nun nur noch den spezifischen Kurs und dessen Zusatzdaten ab.
+// 2. Daten laden
 const { data: course } = await useFetch('/api/kurse/' + urlId)
 const { data: forums } = await useFetch('/api/kurse/foren/' + urlId)
 const { data: files } = await useFetch('/api/dateien/' + urlId)
@@ -23,25 +23,22 @@ const tabs = ['Altklausuren', 'Lösungen', 'Mitschriften', 'Alle Ressourcen']
 const zeigeKursBewertung = ref(false)
 const zeigeDozentBewertung = ref(false)
 
-// Die ID des aktuellen Dozenten sicher auslesen (falls einer existiert)
+// Die ID des aktuellen Dozenten sicher auslesen
 const aktuelleDozentId = computed(() => {
   return course.value?.dozenten?.[0]?.dozent?.id || null
 })
 
-// Wenn eine Bewertung gespeichert wurde, wird die Seite neu geladen,
-// damit die neuen Sterne direkt sichtbar sind.
+// Wenn eine Bewertung gespeichert wurde, wird die Seite neu geladen
 const datenNeuLaden = () => {
   window.location.reload()
 }
 
-// 4. Daten zusammenstellen:
-// Hier bezieht man nun alle Werte (inklusive Beschreibung) dynamisch aus dem 'course' Objekt.
+// 4. Daten zusammenstellen
 const modulDaten = computed(() => {
   const kursInfo = course.value?.kurs;
   const dozentenInfo = course.value?.dozenten;
   const bewertungen = course.value?.bewertungen;
 
-  // Man nimmt den ersten Dozenten für die Anzeige, falls einer vorhanden ist
   const hauptDozent = dozentenInfo && dozentenInfo.length > 0
       ? `${dozentenInfo[0].dozent.vorname} ${dozentenInfo[0].dozent.nachname}`
       : 'Kein Dozent zugewiesen';
@@ -60,27 +57,52 @@ const modulDaten = computed(() => {
   }
 })
 
-// 5. ECHTE Dateien aus der API aufbereiten (Testdaten gelöscht!)
-// --- LOGIK-BEREICH der Kurs-Seite ---
-
-// Hilfsfunktion: Wandelt den Datenbank-Namen in den Tab-Namen um
+// 5. Dateien aus der API aufbereiten
 const formatDateityp = (dbTyp) => {
   if (dbTyp === 'altklausur') return 'Altklausuren'
   if (dbTyp === 'loesung') return 'Lösungen'
   if (dbTyp === 'mitschrift') return 'Mitschriften'
-  return dbTyp // Falls mal was anderes drinsteht
+  return dbTyp 
 }
 
-// Dateien für die Liste aufbereiten
+// Hilfsfunktion: Vereinheitlicht das Jahr auf 4 Ziffern und kürzt das Semester ab
+const formatiereSemesterUndJahr = (semester, jahr) => {
+  if (!semester && !jahr) return '';
+
+  let semStr = semester === 'Sommersemester' ? 'SoSe' : (semester === 'Wintersemester' ? 'WiSe' : (semester || ''));
+  let jahrStr = String(jahr || '').trim();
+
+  // Aus "26" wird "2026"
+  if (/^\d{2}$/.test(jahrStr)) {
+    jahrStr = '20' + jahrStr;
+  } 
+  // Aus "25/26" wird "2025/2026"
+  else if (/^\d{2}\/\d{2}$/.test(jahrStr)) {
+    const parts = jahrStr.split('/');
+    jahrStr = `20${parts[0]}/20${parts[1]}`;
+  }
+  // Aus "2025/26" wird "2025/2026"
+  else if (/^\d{4}\/\d{2}$/.test(jahrStr)) {
+    const parts = jahrStr.split('/');
+    jahrStr = `${parts[0]}/20${parts[1]}`;
+  }
+
+  return `${semStr} ${jahrStr}`.trim();
+}
+
 const materialien = computed(() => {
   if (!files.value?.dateien) return []
 
   return files.value.dateien.map(item => {
     return {
       id: item.id,
-      name: item.dateiname || item.dateipfad.split('/').pop(), // Holt den Namen aus dem Pfad, falls 'dateiname' nicht existiert
-      typ: formatDateityp(item.typ), // Hier übersetzen wir 'loesung' zu 'Lösungen'
+      name: item.dateiname || item.dateipfad.split('/').pop(),
+      typ: formatDateityp(item.typ),
       autor: item.profile?.name || 'Nutzer',
+      semester: item.semester || '',
+      jahr: item.jahr || '',
+      anzeigeSemester: formatiereSemesterUndJahr(item.semester, item.jahr), 
+      datumRaw: item.created_at, 
       datum: item.created_at ? new Date(item.created_at).toLocaleDateString('de-DE') : 'Unbekannt',
       urlAnsehen: `${publicUrlBase}${item.dateipfad}`,
       urlDownload: `${publicUrlBase}${item.dateipfad}?download=${item.dateiname || 'download'}`
@@ -88,33 +110,83 @@ const materialien = computed(() => {
   })
 })
 
-// Hilfsfunktion: Wandelt eine Zahl (0-5) in volle, halbe und leere Sterne um
+// --- SORTIERUNG DER DATEIEN ---
+const sortierung = ref('neueste') 
+
+const toggleSortierung = () => {
+  sortierung.value = sortierung.value === 'neueste' ? 'aelteste' : 'neueste'
+}
+
+const sortierteMaterialien = computed(() => {
+  // 1. Nach Tab filtern
+  let liste = materialien.value.filter(m => aktiverTab.value === 'Alle Ressourcen' || m.typ === aktiverTab.value);
+
+  // 2. Sortieren
+  return liste.sort((a, b) => {
+    const getYearNumber = (jahrStr) => {
+      if (!jahrStr) return 0;
+      const match = String(jahrStr).match(/\d{2,4}/);
+      if (!match) return 0;
+      let y = parseInt(match[0]);
+      return y < 100 ? y + 2000 : y; 
+    };
+
+    const jahrA = getYearNumber(a.jahr);
+    const jahrB = getYearNumber(b.jahr);
+
+    if (jahrA !== jahrB) {
+      return sortierung.value === 'neueste' ? jahrB - jahrA : jahrA - jahrB;
+    } else {
+      const timeA = new Date(a.datumRaw).getTime() || 0;
+      const timeB = new Date(b.datumRaw).getTime() || 0;
+      return sortierung.value === 'neueste' ? timeB - timeA : timeA - timeB;
+    }
+  });
+})
+
+// Hilfsfunktion Sterne
 const generiereSterne = (wert) => {
   if (!wert || isNaN(wert)) return '☆☆☆☆☆';
-
-  // Wir runden auf den nächsten halben Wert (z.B. 3.2 -> 3.0, 3.3 -> 3.5, 3.8 -> 4.0)
   const gerundet = Math.round(wert * 2) / 2;
-
-  const volleSterne = Math.floor(gerundet); // Ganze Zahl vor dem Komma
-  const hatHalbenStern = gerundet % 1 !== 0; // Wahr, wenn es z.B. 3.5 ist
-  const leereSterne = 5 - Math.ceil(gerundet); // Der Rest auf 5
-
+  const volleSterne = Math.floor(gerundet); 
+  const hatHalbenStern = gerundet % 1 !== 0; 
+  const leereSterne = 5 - Math.ceil(gerundet); 
   let sterneText = '';
-
-  // 1. Volle Sterne hinzufügen
   sterneText += '★'.repeat(volleSterne);
-
-  // 2. Halben Stern hinzufügen (falls nötig)
-  if (hatHalbenStern) {
-    // Alternativen für den halben Stern: '⯨' oder '⯪' oder ein halbes SVG.
-    // Wir nutzen hier ein gängiges Unicode-Zeichen.
-    sterneText += '⯨';
-  }
-
-  // 3. Leere Sterne auffüllen
+  if (hatHalbenStern) sterneText += '⯨';
   sterneText += '☆'.repeat(leereSterne);
-
   return sterneText;
+}
+
+// --- ABONNEMENT LOGIK ---
+const { data: aboData, refresh: refreshAbos } = await useFetch("/api/bekommt-updates")
+
+const istAbonniert = computed(() => {
+  const abos = aboData.value?.abonnements || []
+  return abos.some(a => Number(a.kursID) === Number(urlId))
+})
+
+const togglingAbo = ref(false)
+
+const toggleAbo = async () => {
+  if (togglingAbo.value) return
+  togglingAbo.value = true
+  
+  try {
+    if (istAbonniert.value) {
+      await $fetch(`/api/bekommt-updates/${urlId}`, { method: "DELETE" })
+    } else {
+      await $fetch("/api/bekommt-updates", {
+        method: "POST",
+        body: { kursID: Number(urlId) },
+      })
+    }
+    await refreshAbos()
+  } catch (error) {
+    console.error("Fehler beim Ändern des Abonnements:", error)
+  } finally {
+    togglingAbo.value = false
+  }
 }
 </script>
 
@@ -146,37 +218,46 @@ const generiereSterne = (wert) => {
           <section class="bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl shadow-green-900/5 dark:shadow-black/40 border border-green-50 dark:border-gray-700 overflow-hidden transition-colors duration-300">
             <div class="p-8">
 
-              <!-- Vorher war das nur ein <button> -->
               <NuxtLink :to="`/dataAdd?kursId=${urlId}`">
                 <button class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-400 hover:to-blue-400 dark:from-green-600 dark:to-blue-700 dark:hover:from-green-500 dark:hover:to-blue-600 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:-translate-y-1 shadow-md mb-8 flex items-center gap-2">
                   <span class="text-2xl leading-none">+</span> MEHR HOCHLADEN
                 </button>
               </NuxtLink>
 
-              <div class="flex border-b border-slate-100 dark:border-gray-700 mb-6 overflow-x-auto gap-4">
-                <button
-                    v-for="tab in tabs" :key="tab"
-                    @click="aktiverTab = tab"
-                    :class="['pb-3 font-bold text-sm transition-colors whitespace-nowrap',
-                    aktiverTab === tab ? 'text-green-600 dark:text-green-400 border-b-4 border-green-500 dark:border-green-400' : 'text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-300']"
+              <!-- TABS UND SORTIER-BUTTON -->
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-gray-700 mb-6 pb-2">
+                
+                <div class="flex overflow-x-auto gap-4">
+                  <button
+                      v-for="tab in tabs" :key="tab"
+                      @click="aktiverTab = tab"
+                      :class="['font-bold text-sm transition-colors whitespace-nowrap pb-1',
+                      aktiverTab === tab ? 'text-green-600 dark:text-green-400 border-b-4 border-green-500 dark:border-green-400' : 'text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-gray-300']"
+                  >
+                    {{ tab.toUpperCase() }}
+                  </button>
+                </div>
+
+                <button 
+                  @click="toggleSortierung"
+                  class="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-50 dark:bg-gray-800 px-3 py-1.5 rounded-full transition-colors"
                 >
-                  {{ tab.toUpperCase() }}
+                  <span class="text-base leading-none">{{ sortierung === 'neueste' ? '↓' : '↑' }}</span>
+                  {{ sortierung === 'neueste' ? 'Neueste zuerst' : 'Älteste zuerst' }}
                 </button>
               </div>
 
               <div class="space-y-4">
 
-                <!-- NEU: Meldung, wenn die Liste nach dem Filtern leer ist -->
                 <div
-                    v-if="materialien.filter(m => aktiverTab === 'Alle Ressourcen' || m.typ === aktiverTab).length === 0"
+                    v-if="sortierteMaterialien.length === 0"
                     class="p-8 text-center text-slate-400 dark:text-gray-400 font-medium bg-slate-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-slate-200 dark:border-gray-700 transition-colors duration-300"
                 >
                   Noch keine Dateien in dieser Kategorie vorhanden.
                 </div>
 
-                <!-- BESTEHEND: Die normale Schleife für vorhandene Dateien -->
                 <div
-                    v-for="file in materialien.filter(m => aktiverTab === 'Alle Ressourcen' || m.typ === aktiverTab)" :key="file.id"
+                    v-for="file in sortierteMaterialien" :key="file.id"
                     class="flex items-center justify-between p-4 bg-slate-50 dark:bg-gray-800 border border-transparent dark:border-gray-700 rounded-2xl hover:bg-green-50 dark:hover:bg-gray-700 hover:border-green-100 dark:hover:border-green-500 transition-colors"
                 >
                   <NuxtLink
@@ -188,11 +269,16 @@ const generiereSterne = (wert) => {
                     </div>
                     <div class="min-w-0">
                       <p class="font-bold text-slate-800 dark:text-gray-100 truncate">{{ file.name }}</p>
-                      <p class="text-xs text-slate-500 dark:text-gray-400 font-medium">Uploaded by {{ file.autor }}, {{ file.datum }}</p>
+                      
+                      <p class="text-xs text-slate-500 dark:text-gray-400 font-medium mt-0.5">
+                        <span v-if="file.anzeigeSemester" class="text-blue-600 dark:text-blue-400 font-bold mr-2">
+                          {{ file.anzeigeSemester }}
+                        </span>
+                        Uploaded by {{ file.autor }}, {{ file.datum }}
+                      </p>
                     </div>
                   </NuxtLink>
 
-                  <!-- DOWNLOAD (erzwingt das Herunterladen) -->
                   <a
                       :href="file.urlDownload"
                       :download="file.name"
@@ -209,33 +295,29 @@ const generiereSterne = (wert) => {
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-            <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] border border-slate-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 hover:border-green-200 dark:hover:border-green-500 transition-colors">
+            <div class="h-full flex flex-col bg-white dark:bg-gray-900 p-6 rounded-[2rem] border border-slate-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 hover:border-green-200 dark:hover:border-green-500 transition-colors">
               <p class="text-sm font-bold text-slate-400 dark:text-gray-500 mb-2">Dozent</p>
               <p class="font-bold text-slate-800 dark:text-gray-100 text-lg">{{ modulDaten.dozent }}</p>
 
-              <!-- HIER wird die Funktion für den Dozenten aufgerufen -->
               <div class="flex text-amber-400 my-2 text-lg">
                 {{ generiereSterne(modulDaten.bewertungDozent) }}
               </div>
 
-              <!-- Die Zahl kann man zusätzlich noch schön auf eine Nachkommastelle runden -->
               <p class="text-xs font-semibold text-slate-500 dark:text-gray-400">
                 Rating: {{ isNaN(modulDaten.bewertungDozent) ? '-' : Number(modulDaten.bewertungDozent).toFixed(1) }}
               </p>
-              <!-- NEU: Button zum Bewerten -->
               <button
                   v-if="aktuelleDozentId"
                   @click="zeigeDozentBewertung = true"
-                  class="mt-4 w-full bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
+                  class="mt-auto w-full bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
                 Dozent bewerten
               </button>
             </div>
 
-            <div class="bg-white dark:bg-gray-900 p-6 rounded-[2rem] border border-slate-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 hover:border-green-200 dark:hover:border-green-500 transition-colors">
+            <div class="h-full flex flex-col bg-white dark:bg-gray-900 p-6 rounded-[2rem] border border-slate-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 hover:border-green-200 dark:hover:border-green-500 transition-colors">
               <p class="text-sm font-bold text-slate-400 dark:text-gray-500 mb-2">Kurs</p>
               <p class="font-bold text-slate-800 dark:text-gray-100 text-lg line-clamp-1">{{ modulDaten.name }}</p>
 
-              <!-- HIER wird die Funktion für den Kurs aufgerufen -->
               <div class="flex text-amber-400 my-2 text-lg">
                 {{ generiereSterne(modulDaten.bewertungModul) }}
               </div>
@@ -246,14 +328,35 @@ const generiereSterne = (wert) => {
 
               <button
                   @click="zeigeKursBewertung = true"
-                  class="mt-4 w-full bg-slate-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
+                  class="mt-auto w-full bg-slate-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
                 Kurs bewerten
               </button>
             </div>
 
-            <div class="bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-6 rounded-[2rem] border border-green-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 flex flex-col justify-center items-center text-center transition-colors duration-300">
-              <p class="text-sm font-bold text-green-600 dark:text-green-400 mb-1 uppercase tracking-wider">Kurs-ID</p>
-              <p class="text-2xl font-black text-blue-900 dark:text-blue-300">{{ modulDaten.id }}</p>
+            <div class="h-full flex flex-col bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-6 rounded-[2rem] border border-green-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 items-center text-center transition-colors duration-300">
+  
+              <div class="my-auto">
+                <p class="text-sm font-bold text-green-600 dark:text-green-400 mb-1 uppercase tracking-wider">Kurs-ID</p>
+                <p class="text-2xl font-black text-blue-900 dark:text-blue-300">{{ modulDaten.id }}</p>
+              </div>
+              
+              <button
+                @click="toggleAbo"
+                :disabled="togglingAbo"
+                :class="[
+                  'mt-auto w-full py-2 px-4 rounded-xl text-sm font-bold border transition-all duration-200 flex justify-center items-center gap-2',
+                  istAbonniert
+                    ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-700 hover:bg-red-50 hover:text-red-500 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:text-red-400 dark:hover:border-red-700'
+                    : 'bg-white dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-slate-200 dark:border-gray-600 hover:bg-teal-50 hover:text-teal-600 hover:border-teal-200 dark:hover:bg-teal-900/20 dark:hover:text-teal-400',
+                  togglingAbo && 'opacity-50 cursor-not-allowed'
+                ]"
+              >
+                <span v-if="togglingAbo">Lädt...</span>
+                <template v-else>
+                  <span>{{ istAbonniert ? "✓" : "+" }}</span>
+                  <span>{{ istAbonniert ? "Abonniert" : "Abonnieren" }}</span>
+                </template>
+              </button>
             </div>
 
           </div>
@@ -305,10 +408,7 @@ const generiereSterne = (wert) => {
     </div>
   </div>
 
-
-  <!-- MODAL: Kurs bewerten -->
   <div v-if="zeigeKursBewertung" class="fixed inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <!-- Hier wird die Komponente aufgerufen. Man übergibt die kursId und lauscht auf die Events. -->
     <BewertungKurs
         :kursId="urlId"
         @abbrechen="zeigeKursBewertung = false"
@@ -316,9 +416,7 @@ const generiereSterne = (wert) => {
     />
   </div>
 
-  <!-- MODAL: Dozent bewerten -->
   <div v-if="zeigeDozentBewertung" class="fixed inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <!-- HIER: Name auf BewertungProf geändert, passend zur Datei im components-Ordner! -->
     <BewertungProf
         :dozentId="aktuelleDozentId"
         @abbrechen="zeigeDozentBewertung = false"

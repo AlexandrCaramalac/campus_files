@@ -46,7 +46,13 @@ const speichern = async () => {
 
   if (error) {
     console.error("Fehler von Supabase:", error)
-    alert("Fehler beim Speichern.")
+    
+    // NEU: Prüfung auf doppelten Eintrag
+    if (error.code === '23505') {
+      alert("Du hast diesen Dozenten bereits bewertet!")
+    } else {
+      alert("Fehler beim Speichern.")
+    }
   } else {
     emit('gespeichert')
   }

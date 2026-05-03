@@ -46,7 +46,13 @@ const speichern = async () => {
 
   if (error) {
     console.error("Fehler von Supabase:", error)
-    alert("Fehler beim Speichern der Kurs-Bewertung.")
+    
+    // NEU: Prüfung auf doppelten Eintrag
+    if (error.code === '23505') {
+      alert("Du hast diesen Kurs bereits bewertet!")
+    } else {
+      alert("Fehler beim Speichern der Kurs-Bewertung.")
+    }
   } else {
     emit('gespeichert')
   }

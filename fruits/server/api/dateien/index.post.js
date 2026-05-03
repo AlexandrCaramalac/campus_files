@@ -18,14 +18,16 @@ export default eventHandler(async (event) => {
   const multipartData = await readMultipartFormData(event);
 
   const jahrData = multipartData?.find(el => el.name === 'jahr');
+  const semesterData = multipartData?.find(el => el.name === 'semester'); // NEU
   const kursIdData = multipartData?.find(el => el.name === 'kursID');
   const typData = multipartData?.find(el => el.name === 'typ');
   const fileData = multipartData?.find(el => el.name === 'file');
 
-  if (!kursIdData || !typData || !jahrData || !fileData || !fileData.filename) {
+  // NEU: semesterData in die Prüfung aufgenommen
+  if (!kursIdData || !typData || !jahrData || !semesterData || !fileData || !fileData.filename) {
     throw createError({ 
       statusCode: 400, 
-      statusMessage: 'Fehlende Daten: kursID, typ, jahr oder Datei nicht gefunden.' 
+      statusMessage: 'Fehlende Daten: kursID, typ, jahr, semester oder Datei nicht gefunden.' 
     });
   } 
 
@@ -35,14 +37,9 @@ export default eventHandler(async (event) => {
   const einzigartigerDateiname = `${user.id}-${Date.now()}-${dateiname}`;
   const dateipfad = `${typ}/${kursID}/${einzigartigerDateiname}`;
 
-  const jahr = parseInt(jahrData.data.toString(), 10);
-
-  if (isNaN(jahr)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: 'Jahr muss eine gültige Zahl sein.'
-    });
-  }
+  // NEU: Jahr und Semester als Text auslesen (kein parseInt mehr für das Jahr)
+  const jahr = jahrData.data.toString().trim();
+  const semester = semesterData.data.toString().trim();
   
   const { error: uploadError } = await client.storage
     .from('kurs_dateien')
@@ -64,7 +61,8 @@ export default eventHandler(async (event) => {
     nutzerID: user.id,
     dateipfad: dateipfad,
     dateiname: dateiname,
-    jahr: jahr
+    jahr: jahr,           // Jahr wird als Text gespeichert
+    semester: semester    // NEU: Semester wird gespeichert
   })
   .select()
   .single();

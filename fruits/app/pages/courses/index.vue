@@ -22,22 +22,6 @@ const filteredCourses = computed(() => {
       course.name.toLowerCase().includes(search.value.toLowerCase())
   )
 })
-
-/*
-  Markiert den passenden Teil des Suchbegriffs.
-  Lightmode: gelb
-  Darkmode: dunkleres Gelb/Orange
-*/
-const highlightMatch = (text) => {
-  if (!search.value) return text
-
-  const regex = new RegExp(`(${search.value})`, "gi")
-
-  return text.replace(
-      regex,
-      `<span class="bg-yellow-200 dark:bg-yellow-700 dark:text-white rounded px-1">$1</span>`
-  )
-}
 </script>
 
 <template>
@@ -95,7 +79,7 @@ const highlightMatch = (text) => {
               :to="`/courses/${course.id}`"
               class="flex items-center justify-between p-4 w-full cursor-pointer"
           >
-            <!-- Kursname -->
+            <!-- Kursname OHNE Markierung -->
             <h2
                 class="text-xl md:text-2xl font-bold
                      text-slate-700 dark:text-gray-100
@@ -104,7 +88,7 @@ const highlightMatch = (text) => {
                      dark:group-hover:from-teal-400 dark:group-hover:to-blue-500
                      transition-all duration-300"
             >
-              <span v-html="highlightMatch(course.name)"></span>
+              {{ course.name }}
             </h2>
 
             <!-- Pfeil-Kreis -->
