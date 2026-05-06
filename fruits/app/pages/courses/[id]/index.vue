@@ -8,8 +8,31 @@
 
   // 2. Daten laden: Man fragt nun nur noch den spezifischen Kurs und dessen Zusatzdaten ab.
   const { data: course } = await useFetch('/api/kurse/' + urlId)
-  const { data: forums } = await useFetch('/api/kurse/foren/' + urlId)
+  const { data: forums, refresh: refreshForums } = await useFetch('/api/kurse/foren/' + urlId)
   const { data: files } = await useFetch('/api/dateien/' + urlId)
+
+  const user = useSupabaseUser()
+  const neuesDiskussionsThema = ref('')
+  const postet = ref(false)
+  const postFehler = ref('')
+
+  const diskussionPosten = async () => {
+    if (!neuesDiskussionsThema.value.trim()) return
+    postet.value = true
+    postFehler.value = ''
+    try {
+      await $fetch('/api/kurse/foren', {
+        method: 'POST',
+        body: { kursID: Number(urlId), thema: neuesDiskussionsThema.value.trim() }
+      })
+      neuesDiskussionsThema.value = ''
+      await refreshForums()
+    } catch (err) {
+      postFehler.value = err?.data?.message || err?.message || 'Beitrag konnte nicht gespeichert werden.'
+    } finally {
+      postet.value = false
+    }
+  }
 
   const supabase = useSupabaseClient()
   const { data: { publicUrl } } = supabase.storage.from('kurs_dateien').getPublicUrl('')
@@ -228,44 +251,71 @@ const materialien = computed(() => {
           </div>
 
           <aside class="bg-white rounded-[2rem] shadow-xl shadow-green-900/5 border border-slate-100 flex flex-col h-fit overflow-hidden">
-            
+
             <div class="p-6 bg-slate-50 border-b border-slate-100 text-center">
               <h2 class="font-extrabold text-slate-700 uppercase tracking-widest text-sm">Diskussionen</h2>
             </div>
-            
-            <div class="p-6 space-y-6">
-              <div class="group cursor-pointer">
-                <p class="font-bold text-sm text-slate-800 group-hover:text-blue-600 transition-colors">SQL JOIN-Fragen?</p>
-                <p class="text-xs font-medium text-slate-400 mt-1">Darian · vor 12 Min</p>
-              </div>
-              <div class="border-t border-slate-100 pt-5 group cursor-pointer">
-                <p class="font-bold text-sm text-slate-800 group-hover:text-blue-600 transition-colors">Wann sind die Ergebnisse?</p>
-                <p class="text-xs font-medium text-slate-400 mt-1">Clara · vor 2 Std</p>
-              </div>
-              <div class="border-t border-slate-100 pt-5 group cursor-pointer">
-                <p class="font-bold text-sm text-slate-800 group-hover:text-blue-600 transition-colors">Wie lerne ich Normalisierung?</p>
-                <p class="text-xs font-medium text-slate-400 mt-1">Jan · gestern</p>
-              </div>
-            </div>
 
-            <div class="p-6 mt-auto bg-slate-50 space-y-4">
-              <textarea
-                class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-sm"
-                rows="3"
-                placeholder="Stell eine Frage..."
-              ></textarea>
-
-              <button class="w-full bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
-                POSTEN
-              </button>
-
-              <NuxtLink to="/forum" class="block">
-                <button class="w-full bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 transition-colors shadow-md">
-                  ALLE BEITRÄGE
-                </button>
+            <!-- Echte Beiträge aus der Datenbank -->
+            <div class="p-6 space-y-4 max-h-72 overflow-y-auto">
+              <div v-if="!forums?.beitraege?.length" class="text-center py-4 text-slate-400 text-sm">
+                Noch keine Diskussionen.
+              </div>
+              <NuxtLink
+                v-for="(item, index) in forums?.beitraege"
+                :key="item.id"
+                :to="`/courses/${urlId}/${item.id}`"
+                :class="['block group', index > 0 ? 'border-t border-slate-100 pt-4' : '']"
+              >
+                <p class="font-bold text-sm text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2">{{ item.thema }}</p>
+                <div class="flex items-center gap-2">
+                  <img
+                    v-if="item.profile?.avatar"
+                    :src="item.profile.avatar"
+                    :alt="item.profile?.name || 'Nutzer'"
+                    class="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                  />
+                  <div v-else class="w-5 h-5 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center flex-shrink-0 text-white text-[10px] font-black">
+                    {{ (item.profile?.name || 'N')[0].toUpperCase() }}
+                  </div>
+                  <p class="text-xs font-medium text-slate-400">
+                    {{ item.profile?.name || 'Nutzer' }} ·
+                    {{ new Date(item.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}
+                  </p>
+                </div>
               </NuxtLink>
             </div>
-            
+
+            <!-- Eingabe nur für angemeldete Nutzer -->
+            <div class="p-6 mt-auto bg-slate-50 border-t border-slate-100 space-y-3">
+              <div v-if="user">
+                <p v-if="postFehler" class="text-red-500 text-xs font-medium mb-2">{{ postFehler }}</p>
+                <textarea
+                  v-model="neuesDiskussionsThema"
+                  class="w-full p-4 bg-white border border-slate-200 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-transparent transition"
+                  rows="3"
+                  placeholder="Stell eine Frage..."
+                  :disabled="postet"
+                ></textarea>
+                <button
+                  @click="diskussionPosten"
+                  :disabled="postet || !neuesDiskussionsThema.trim()"
+                  class="w-full bg-slate-800 text-white font-bold py-3 rounded-full hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md text-sm"
+                >
+                  {{ postet ? 'WIRD GEPOSTET...' : 'POSTEN' }}
+                </button>
+              </div>
+              <div v-else class="text-center py-2">
+                <p class="text-slate-500 text-sm mb-3 font-medium">Anmelden um zu diskutieren.</p>
+                <NuxtLink
+                  to="/login"
+                  class="inline-block bg-slate-800 text-white font-bold py-2 px-6 rounded-full hover:bg-green-600 transition-colors text-sm"
+                >
+                  Anmelden
+                </NuxtLink>
+              </div>
+            </div>
+
           </aside>
 
         </div>
