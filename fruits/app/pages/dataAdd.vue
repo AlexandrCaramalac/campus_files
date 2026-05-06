@@ -10,8 +10,8 @@ const route = useRoute();
 // Formulardaten
 const selectedKurs = ref(null);
 const selectedTyp = ref('altklausur');
-const selectedSemester = ref('Sommersemester'); // NEU: Semester-Auswahl
-const selectedJahr = ref(''); // Jetzt als String, damit man "23/24" schreiben kann
+const selectedSemester = ref('Sommersemester'); 
+const selectedJahr = ref(''); // Speichert nun ein volles Jahr (z.B. 2025)
 const selectedFile = ref(null);
 
 // Status
@@ -45,7 +45,7 @@ async function uploadFile() {
   const formData = new FormData();
   formData.append('kursID', selectedKurs.value);
   formData.append('typ', selectedTyp.value);
-  formData.append('semester', selectedSemester.value); // NEU: Semester wird mitgeschickt
+  formData.append('semester', selectedSemester.value);
   formData.append('jahr', selectedJahr.value);
   formData.append('file', selectedFile.value, selectedFile.value.name);
 
@@ -158,15 +158,17 @@ async function uploadFile() {
 
             <div>
               <label for="jahr" class="block text-sm font-bold text-slate-600 dark:text-gray-400 mb-2">Jahr</label>
-              <!-- Geändert auf type="text", damit Eingaben wie "23/24" möglich sind -->
+              <!-- Geändert auf type="number", um nur noch volle Jahre zu erlauben -->
               <input 
-                type="text" 
+                type="number" 
                 id="jahr" 
                 v-model="selectedJahr" 
-                placeholder="z.B. 2024 oder 23/24"
+                placeholder="z.B. 2025"
                 required 
-                pattern="^(\d{4}|\d{2}/\d{2}|\d{4}/\d{4})$"
-                title="Bitte ein gültiges Jahr eingeben (z.B. 2024, 23/24 oder 2023/2024)"
+                min="1990"
+                max="2100"
+                step="1"
+                title="Bitte ein vierstelliges Jahr eingeben (z.B. 2025)"
                 class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-800 dark:text-gray-100 focus:ring-2 focus:ring-teal-400 outline-none transition-colors"
               />
             </div>
