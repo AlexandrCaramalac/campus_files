@@ -267,11 +267,22 @@ const materialien = computed(() => {
                 :to="`/courses/${urlId}/${item.id}`"
                 :class="['block group', index > 0 ? 'border-t border-slate-100 pt-4' : '']"
               >
-                <p class="font-bold text-sm text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2">{{ item.thema }}</p>
-                <p class="text-xs font-medium text-slate-400 mt-1">
-                  {{ item.profile?.name || 'Nutzer' }} ·
-                  {{ new Date(item.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}
-                </p>
+                <p class="font-bold text-sm text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-2">{{ item.thema }}</p>
+                <div class="flex items-center gap-2">
+                  <img
+                    v-if="item.profile?.avatar"
+                    :src="item.profile.avatar"
+                    :alt="item.profile?.name || 'Nutzer'"
+                    class="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                  />
+                  <div v-else class="w-5 h-5 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center flex-shrink-0 text-white text-[10px] font-black">
+                    {{ (item.profile?.name || 'N')[0].toUpperCase() }}
+                  </div>
+                  <p class="text-xs font-medium text-slate-400">
+                    {{ item.profile?.name || 'Nutzer' }} ·
+                    {{ new Date(item.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}
+                  </p>
+                </div>
               </NuxtLink>
             </div>
 
