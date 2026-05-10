@@ -59,7 +59,7 @@ const kommentarAbsenden = async () => {
           <div class="flex items-center gap-2 mt-2" v-if="beitrag">
             <img
               v-if="beitrag.profile?.avatar"
-              :src="beitrag.profile.avatar"
+              :src="`/avatars/${beitrag.profile.avatar}.png`"
               :alt="beitrag.profile?.name || 'Nutzer'"
               class="w-6 h-6 rounded-full object-cover flex-shrink-0"
             />
@@ -104,7 +104,7 @@ const kommentarAbsenden = async () => {
             <div class="flex items-center gap-3 mb-2">
               <img
                 v-if="k.profile?.avatar"
-                :src="k.profile.avatar"
+                :src="`/avatars/${k.profile.avatar}.png`"
                 :alt="k.profile?.name || 'Nutzer'"
                 class="w-8 h-8 rounded-full object-cover flex-shrink-0"
               />
