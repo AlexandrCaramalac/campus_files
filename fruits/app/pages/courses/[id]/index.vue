@@ -363,9 +363,24 @@ const toggleAbo = async () => {
               </button>
             </div>
 
-            <div class="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-[2rem] border border-green-100 shadow-lg shadow-blue-900/5 flex flex-col justify-center items-center text-center">
-              <p class="text-sm font-bold text-green-600 mb-1 uppercase tracking-wider">Kurs-ID</p>
-              <p class="text-2xl font-black text-blue-900">{{ modulDaten.id }}</p>
+            <!-- Dritte Karte: Kurs-ID & Abonnieren -->
+            <div class="bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-[2rem] border border-green-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 flex flex-col items-center text-center transition-colors duration-300">
+              
+              <div class="my-auto">
+                <p class="text-sm font-bold text-green-600 dark:text-green-500 mb-1 uppercase tracking-wider">Kurs-ID</p>
+                <p class="text-2xl font-black text-blue-900 dark:text-blue-100">{{ modulDaten.id }}</p>
+              </div>
+
+              <button
+                @click="toggleAbo"
+                :disabled="togglingAbo"
+                class="mt-auto w-full py-2 px-4 rounded-xl text-sm font-bold border transition-all duration-200 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-slate-200 dark:border-gray-600 hover:bg-teal-50 hover:text-teal-600 hover:border-teal-200 dark:hover:bg-teal-900/20 dark:hover:text-teal-400 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span v-if="!istAbonniert" class="text-lg leading-none">+</span>
+                <span v-else class="text-lg leading-none">✓</span>
+                <span>{{ istAbonniert ? 'Abonniert' : 'Abonnieren' }}</span>
+              </button>
+
             </div>
           </div>
 
