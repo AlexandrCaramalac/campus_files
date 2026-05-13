@@ -5,7 +5,30 @@ const route = useRoute()
 
 // NEU: 'refresh: refreshLecturer' hinzugefügt, um die Daten nach der Bewertung stumm neu zu laden
 const { data: lecturer, refresh: refreshLecturer } = await useFetch('/api/dozenten/' + route.params.id)
-const { data: forums } = await useFetch('/api/dozenten/foren/' + route.params.id)
+const { data: forums, refresh: refreshForums } = await useFetch('/api/dozenten/foren/' + route.params.id)
+
+const user = useSupabaseUser()
+const neuesDiskussionsThema = ref('')
+const postet = ref(false)
+const postFehler = ref('')
+
+const diskussionPosten = async () => {
+  if (!neuesDiskussionsThema.value.trim()) return
+  postet.value = true
+  postFehler.value = ''
+  try {
+    await $fetch('/api/dozenten/foren', {
+      method: 'POST',
+      body: { dozentID: Number(route.params.id), thema: neuesDiskussionsThema.value.trim() }
+    })
+    neuesDiskussionsThema.value = ''
+    await refreshForums()
+  } catch (err) {
+    postFehler.value = err?.data?.message || err?.message || 'Beitrag konnte nicht gespeichert werden.'
+  } finally {
+    postet.value = false
+  }
+}
 
 // NEU: Steuerung für das Bewertungs-Pop-up
 const zeigeDozentBewertung = ref(false)
@@ -152,41 +175,74 @@ const generiereSterne = (wert) => {
         <aside class="bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl shadow-green-900/5 dark:shadow-black/40 border border-slate-100 dark:border-gray-700 flex flex-col h-fit overflow-hidden transition-colors duration-300">
 
           <div class="p-6 bg-slate-50 dark:bg-gray-800 border-b border-slate-100 dark:border-gray-700 text-center transition-colors duration-300">
-            <h2 class="font-extrabold text-slate-700 dark:text-gray-100 uppercase tracking-widest text-sm">
-              Diskussionen
-            </h2>
+            <h2 class="font-extrabold text-slate-700 dark:text-gray-100 uppercase tracking-widest text-sm">Diskussionen</h2>
           </div>
 
-          <div class="p-6 space-y-6">
-
-            <div
-                v-for="item in forums?.beitraege"
-                :key="item.id"
-                class="group cursor-pointer border-b border-slate-100 dark:border-gray-700 pb-4 last:border-none"
+          <!-- Beitragsliste -->
+          <div class="p-6 space-y-4 max-h-72 overflow-y-auto">
+            <div v-if="!forums?.beitraege?.length" class="text-center py-4 text-slate-400 dark:text-gray-500 text-sm">
+              Noch keine Diskussionen.
+            </div>
+            <NuxtLink
+              v-for="(item, index) in forums?.beitraege"
+              :key="item.id"
+              :to="`/lecturers/${route.params.id}/${item.id}`"
+              :class="['block group', index > 0 ? 'border-t border-slate-100 dark:border-gray-700 pt-4' : '']"
             >
-              <p class="font-bold text-sm text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                {{ item.thema }}
-              </p>
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <p class="font-bold text-sm text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">{{ item.thema }}</p>
+                <span
+                  v-if="item.kommentar_dozent?.[0]?.count > 0"
+                  class="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-blue-500 mt-1"
+                  title="Wurde beantwortet"
+                ></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <img
+                  v-if="item.profile?.avatar"
+                  :src="`/avatars/${item.profile.avatar}.png`"
+                  :alt="item.profile?.name || 'Nutzer'"
+                  class="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                />
+                <div v-else class="w-5 h-5 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center flex-shrink-0 text-white text-[10px] font-black">
+                  {{ (item.profile?.name || 'N')[0].toUpperCase() }}
+                </div>
+                <p class="text-xs font-medium text-slate-400 dark:text-gray-500">
+                  {{ item.profile?.name || 'Nutzer' }} ·
+                  {{ new Date(item.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}
+                </p>
+              </div>
+            </NuxtLink>
+          </div>
 
-              <p class="text-xs font-medium text-slate-400 dark:text-gray-500 mt-1">
-                {{ item.profile.name }} ·
-                {{ new Date(item.created_at).toLocaleDateString('de-DE', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }) }}
-              </p>
-
-              <NuxtLink
-                  :to="`/lecturers/${route.params.id}/${item.id}`"
-                  class="text-blue-600 dark:text-blue-400 text-xs font-bold mt-2 inline-block hover:underline"
+          <!-- Eingabe -->
+          <div class="p-6 mt-auto bg-slate-50 dark:bg-gray-800 border-t border-slate-100 dark:border-gray-700 space-y-3 transition-colors duration-300">
+            <div v-if="user">
+              <p v-if="postFehler" class="text-red-500 text-xs font-medium mb-2">{{ postFehler }}</p>
+              <textarea
+                v-model="neuesDiskussionsThema"
+                class="w-full p-4 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl text-sm text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-300"
+                rows="3"
+                placeholder="Stell eine Frage..."
+                :disabled="postet"
+              ></textarea>
+              <button
+                @click="diskussionPosten"
+                :disabled="postet || !neuesDiskussionsThema.trim()"
+                class="w-full bg-slate-800 dark:bg-gray-700 text-white font-bold py-3 rounded-full hover:bg-green-600 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md text-sm mt-3"
               >
-                Kommentare ansehen →
+                {{ postet ? 'WIRD GEPOSTET...' : 'POSTEN' }}
+              </button>
+            </div>
+            <div v-else class="text-center py-2">
+              <p class="text-slate-500 dark:text-gray-400 text-sm mb-3 font-medium">Anmelden um zu diskutieren.</p>
+              <NuxtLink
+                to="/login"
+                class="inline-block bg-slate-800 dark:bg-gray-700 text-white font-bold py-2 px-6 rounded-full hover:bg-green-600 dark:hover:bg-green-600 transition-colors text-sm"
+              >
+                Anmelden
               </NuxtLink>
             </div>
-
           </div>
 
         </aside>

@@ -389,11 +389,18 @@ const toggleAbo = async () => {
               :to="`/courses/${urlId}/${item.id}`"
               :class="['block group', index > 0 ? 'border-t border-slate-100 dark:border-gray-700 pt-4' : '']"
             >
-              <p class="font-bold text-sm text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 mb-2">{{ item.thema }}</p>
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <p class="font-bold text-sm text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">{{ item.thema }}</p>
+                <span
+                  v-if="item.kommentar_kurs?.[0]?.count > 0"
+                  class="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-blue-500 mt-1"
+                  title="Wurde beantwortet"
+                ></span>
+              </div>
               <div class="flex items-center gap-2">
                 <img
                   v-if="item.profile?.avatar"
-                  :src="item.profile.avatar"
+                  :src="`/avatars/${item.profile.avatar}.png`"
                   :alt="item.profile?.name || 'Nutzer'"
                   class="w-5 h-5 rounded-full object-cover flex-shrink-0"
                 />
