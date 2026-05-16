@@ -275,7 +275,7 @@ const toggleAbo = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 dark:bg-black font-sans text-slate-800 dark:text-gray-100 pb-12 transition-colors duration-300">
+  <div class="min-h-screen bg-slate-50 dark:bg-black font-sans text-slate-800 dark:text-gray-100 pb-20 transition-colors duration-300">
     <div class="max-w-7xl mx-auto p-4 md:p-8">
 
       <!-- ZURÜCK-BUTTON -->
