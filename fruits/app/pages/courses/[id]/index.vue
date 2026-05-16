@@ -45,11 +45,66 @@ const tabs = ['Altklausuren', 'Karteikarten', 'Mitschriften', 'Alle Ressourcen']
 // --- Steuerung für die Bewertungs-Popups ---
 const zeigeKursBewertung = ref(false)
 const zeigeDozentBewertung = ref(false)
+const bewertungsFehler = ref('')
 
 // Die ID des aktuellen Dozenten sicher auslesen
 const aktuelleDozentId = computed(() => {
   return course.value?.dozenten?.[0]?.dozent?.id || null
 })
+
+const kursBewertungStarten = async () => {
+  bewertungsFehler.value = ''
+
+  if (!user.value) {
+    bewertungsFehler.value = 'Du musst angemeldet sein, um eine Bewertung abzugeben.'
+    return
+  }
+
+  try {
+    const { alreadyRated } = await $fetch(`/api/kurse/bewertung/check?kursID=${urlId}`)
+
+    if (alreadyRated) {
+      bewertungsFehler.value = 'Du hast diesen Kurs bereits bewertet.'
+      return
+    }
+
+    zeigeKursBewertung.value = true
+  } catch (error) {
+    console.error('Fehler beim Prüfen der Kursbewertung:', error)
+    bewertungsFehler.value = 'Bewertung konnte nicht geprüft werden.'
+  }
+}
+
+// Fehlermeldung erscheint, sobald jemand mehr als einmal bewerten möchte:
+const dozentBewertungStarten = async () => {
+  bewertungsFehler.value = ''
+
+  if (!user.value) {
+    bewertungsFehler.value = 'Du musst angemeldet sein, um eine Bewertung abzugeben.'
+    return
+  }
+
+  if (!aktuelleDozentId.value) {
+    bewertungsFehler.value = 'Zu diesem Kurs ist kein Dozent hinterlegt.'
+    return
+  }
+
+  try {
+    const { alreadyRated } = await $fetch(
+        `/api/dozenten/bewertung/check?dozentID=${aktuelleDozentId.value}`
+    )
+
+    if (alreadyRated) {
+      bewertungsFehler.value = 'Du hast diesen Dozenten bereits bewertet.'
+      return
+    }
+
+    zeigeDozentBewertung.value = true
+  } catch (error) {
+    console.error('Fehler beim Prüfen der Dozentenbewertung:', error)
+    bewertungsFehler.value = 'Bewertung konnte nicht geprüft werden.'
+  }
+}
 
 // Wenn eine Bewertung gespeichert wurde, wird die Seite neu geladen
 const datenNeuLaden = async () => {
@@ -57,8 +112,8 @@ const datenNeuLaden = async () => {
   await refreshCourse()
   await refreshForums()
   await refreshFiles()
-  
-  // Da kein Seiten-Reload stattfindet, bleibt der Darkmode-Status 
+
+  // Da kein Seiten-Reload stattfindet, bleibt der Darkmode-Status
   // der Website (im HTML-Tag oder State) unangetastet!
 }
 
@@ -91,7 +146,7 @@ const formatDateityp = (dbTyp) => {
   if (dbTyp === 'altklausur') return 'Altklausuren'
   if (dbTyp === 'loesung') return 'Lösungen'
   if (dbTyp === 'mitschrift') return 'Mitschriften'
-  return dbTyp 
+  return dbTyp
 }
 
 // Hilfsfunktion: Vereinheitlicht das Jahr auf 4 Ziffern und kürzt das Semester ab
@@ -104,7 +159,7 @@ const formatiereSemesterUndJahr = (semester, jahr) => {
   // Aus "26" wird "2026"
   if (/^\d{2}$/.test(jahrStr)) {
     jahrStr = '20' + jahrStr;
-  } 
+  }
   // Aus "25/26" wird "2025/2026"
   else if (/^\d{2}\/\d{2}$/.test(jahrStr)) {
     const parts = jahrStr.split('/');
@@ -130,8 +185,8 @@ const materialien = computed(() => {
       autor: item.profile?.name || 'Nutzer',
       semester: item.semester || '',
       jahr: item.jahr || '',
-      anzeigeSemester: formatiereSemesterUndJahr(item.semester, item.jahr), 
-      datumRaw: item.created_at, 
+      anzeigeSemester: formatiereSemesterUndJahr(item.semester, item.jahr),
+      datumRaw: item.created_at,
       datum: item.created_at ? new Date(item.created_at).toLocaleDateString('de-DE') : 'Unbekannt',
       urlAnsehen: `${publicUrlBase}${item.dateipfad}`,
       urlDownload: `${publicUrlBase}${item.dateipfad}?download=${item.dateiname || 'download'}`
@@ -140,7 +195,7 @@ const materialien = computed(() => {
 })
 
 // --- SORTIERUNG DER DATEIEN ---
-const sortierung = ref('neueste') 
+const sortierung = ref('neueste')
 
 const toggleSortierung = () => {
   sortierung.value = sortierung.value === 'neueste' ? 'aelteste' : 'neueste'
@@ -157,7 +212,7 @@ const sortierteMaterialien = computed(() => {
       const match = String(jahrStr).match(/\d{2,4}/);
       if (!match) return 0;
       let y = parseInt(match[0]);
-      return y < 100 ? y + 2000 : y; 
+      return y < 100 ? y + 2000 : y;
     };
 
     const jahrA = getYearNumber(a.jahr);
@@ -177,9 +232,9 @@ const sortierteMaterialien = computed(() => {
 const generiereSterne = (wert) => {
   if (!wert || isNaN(wert)) return '☆☆☆☆☆';
   const gerundet = Math.round(wert * 2) / 2;
-  const volleSterne = Math.floor(gerundet); 
-  const hatHalbenStern = gerundet % 1 !== 0; 
-  const leereSterne = 5 - Math.ceil(gerundet); 
+  const volleSterne = Math.floor(gerundet);
+  const hatHalbenStern = gerundet % 1 !== 0;
+  const leereSterne = 5 - Math.ceil(gerundet);
   let sterneText = '';
   sterneText += '★'.repeat(volleSterne);
   if (hatHalbenStern) sterneText += '⯨';
@@ -200,7 +255,7 @@ const togglingAbo = ref(false)
 const toggleAbo = async () => {
   if (togglingAbo.value) return
   togglingAbo.value = true
-  
+
   try {
     if (istAbonniert.value) {
       await $fetch(`/api/bekommt-updates/${urlId}`, { method: "DELETE" })
@@ -271,9 +326,9 @@ const toggleAbo = async () => {
                   </button>
                 </div>
 
-                <button 
-                  @click="toggleSortierung"
-                  class="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-50 dark:bg-gray-800 px-3 py-1.5 rounded-full transition-colors"
+                <button
+                    @click="toggleSortierung"
+                    class="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 bg-slate-50 dark:bg-gray-800 px-3 py-1.5 rounded-full transition-colors"
                 >
                   <span class="text-base leading-none">{{ sortierung === 'neueste' ? '↓' : '↑' }}</span>
                   {{ sortierung === 'neueste' ? 'Neueste zuerst' : 'Älteste zuerst' }}
@@ -354,7 +409,7 @@ const toggleAbo = async () => {
               </p>
               <button
                   v-if="aktuelleDozentId"
-                  @click="zeigeDozentBewertung = true"
+                  @click="dozentBewertungStarten"
                   class="mt-auto w-full bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
                 Dozent bewerten
               </button>
@@ -373,7 +428,7 @@ const toggleAbo = async () => {
               </p>
 
               <button
-                  @click="zeigeKursBewertung = true"
+                  @click="kursBewertungStarten"
                   class="mt-auto w-full bg-slate-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
                 Kurs bewerten
               </button>
@@ -381,22 +436,28 @@ const toggleAbo = async () => {
 
             <!-- Dritte Karte: Kurs-ID & Abonnieren -->
             <div class="bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-[2rem] border border-green-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 flex flex-col items-center text-center transition-colors duration-300">
-              
+
               <div class="my-auto">
                 <p class="text-sm font-bold text-green-600 dark:text-green-500 mb-1 uppercase tracking-wider">Kurs-ID</p>
                 <p class="text-2xl font-black text-blue-900 dark:text-blue-100">{{ modulDaten.id }}</p>
               </div>
 
               <button
-                @click="toggleAbo"
-                :disabled="togglingAbo"
-                class="mt-auto w-full py-2 px-4 rounded-xl text-sm font-bold border transition-all duration-200 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-slate-200 dark:border-gray-600 hover:bg-teal-50 hover:text-teal-600 hover:border-teal-200 dark:hover:bg-teal-900/20 dark:hover:text-teal-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  @click="toggleAbo"
+                  :disabled="togglingAbo"
+                  class="mt-auto w-full py-2 px-4 rounded-xl text-sm font-bold border transition-all duration-200 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-slate-200 dark:border-gray-600 hover:bg-teal-50 hover:text-teal-600 hover:border-teal-200 dark:hover:bg-teal-900/20 dark:hover:text-teal-400 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span v-if="!istAbonniert" class="text-lg leading-none">+</span>
                 <span v-else class="text-lg leading-none">✓</span>
                 <span>{{ istAbonniert ? 'Abonniert' : 'Abonnieren' }}</span>
               </button>
 
+            </div>
+
+            <div v-if="bewertungsFehler" class="md:col-span-3">
+              <p class="text-sm font-semibold text-red-500 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3">
+                {{ bewertungsFehler }}
+              </p>
             </div>
           </div>
 
@@ -415,25 +476,25 @@ const toggleAbo = async () => {
               Noch keine Diskussionen.
             </div>
             <NuxtLink
-              v-for="(item, index) in forums?.beitraege"
-              :key="item.id"
-              :to="`/courses/${urlId}/${item.id}`"
-              :class="['block group', index > 0 ? 'border-t border-slate-100 dark:border-gray-700 pt-4' : '']"
+                v-for="(item, index) in forums?.beitraege"
+                :key="item.id"
+                :to="`/courses/${urlId}/${item.id}`"
+                :class="['block group', index > 0 ? 'border-t border-slate-100 dark:border-gray-700 pt-4' : '']"
             >
               <div class="flex items-start justify-between gap-2 mb-2">
                 <p class="font-bold text-sm text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">{{ item.thema }}</p>
                 <span
-                  v-if="item.kommentar_kurs?.[0]?.count > 0"
-                  class="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-blue-500 mt-1"
-                  title="Wurde beantwortet"
+                    v-if="item.kommentar_kurs?.[0]?.count > 0"
+                    class="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-blue-500 mt-1"
+                    title="Wurde beantwortet"
                 ></span>
               </div>
               <div class="flex items-center gap-2">
                 <img
-                  v-if="item.profile?.avatar"
-                  :src="`/avatars/${item.profile.avatar}.png`"
-                  :alt="item.profile?.name || 'Nutzer'"
-                  class="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                    v-if="item.profile?.avatar"
+                    :src="`/avatars/${item.profile.avatar}.png`"
+                    :alt="item.profile?.name || 'Nutzer'"
+                    class="w-5 h-5 rounded-full object-cover flex-shrink-0"
                 />
                 <div v-else class="w-5 h-5 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center flex-shrink-0 text-white text-[10px] font-black">
                   {{ (item.profile?.name || 'N')[0].toUpperCase() }}
@@ -451,16 +512,16 @@ const toggleAbo = async () => {
             <div v-if="user">
               <p v-if="postFehler" class="text-red-500 text-xs font-medium mb-2">{{ postFehler }}</p>
               <textarea
-                v-model="neuesDiskussionsThema"
-                class="w-full p-4 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl text-sm text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-300"
-                rows="3"
-                placeholder="Stell eine Frage..."
-                :disabled="postet"
+                  v-model="neuesDiskussionsThema"
+                  class="w-full p-4 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl text-sm text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-300"
+                  rows="3"
+                  placeholder="Stell eine Frage..."
+                  :disabled="postet"
               ></textarea>
               <button
-                @click="diskussionPosten"
-                :disabled="postet || !neuesDiskussionsThema.trim()"
-                class="w-full bg-slate-800 dark:bg-gray-700 text-white font-bold py-3 rounded-full hover:bg-green-600 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md text-sm mt-3"
+                  @click="diskussionPosten"
+                  :disabled="postet || !neuesDiskussionsThema.trim()"
+                  class="w-full bg-slate-800 dark:bg-gray-700 text-white font-bold py-3 rounded-full hover:bg-green-600 dark:hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md text-sm mt-3"
               >
                 {{ postet ? 'WIRD GEPOSTET...' : 'POSTEN' }}
               </button>
@@ -468,8 +529,8 @@ const toggleAbo = async () => {
             <div v-else class="text-center py-2">
               <p class="text-slate-500 dark:text-gray-400 text-sm mb-3 font-medium">Anmelden um zu diskutieren.</p>
               <NuxtLink
-                to="/login"
-                class="inline-block bg-slate-800 dark:bg-gray-700 text-white font-bold py-2 px-6 rounded-full hover:bg-green-600 dark:hover:bg-green-600 transition-colors text-sm"
+                  to="/login"
+                  class="inline-block bg-slate-800 dark:bg-gray-700 text-white font-bold py-2 px-6 rounded-full hover:bg-green-600 dark:hover:bg-green-600 transition-colors text-sm"
               >
                 Anmelden
               </NuxtLink>
