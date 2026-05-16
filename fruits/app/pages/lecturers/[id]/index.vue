@@ -156,15 +156,15 @@ const generiereSterne = (wert) => {
                 Unterrichtete Kurse
               </h2>
 
-              <div class="space-y-3">
-                <div
-                    v-for="(course, index) in lecturer?.kurse"
-                    :key="index"
-                    class="p-4 bg-slate-50 dark:bg-gray-800 rounded-xl font-semibold hover:bg-green-50 dark:hover:bg-gray-700 transition-colors text-slate-800 dark:text-gray-100"
-                >
-                  {{ course }}
-                </div>
-              </div>
+              <!--Verlinkung zu den Kursen-->
+              <NuxtLink
+                  v-for="course in lecturer?.kurse"
+                  :key="course.id"
+                  :to="`/courses/${course.id}`"
+                  class="block p-4 bg-slate-50 dark:bg-gray-800 rounded-xl font-semibold hover:bg-green-50 dark:hover:bg-gray-700 transition-colors text-slate-800 dark:text-gray-100"
+              >
+                {{ course.name }}
+              </NuxtLink>
 
             </div>
           </section>

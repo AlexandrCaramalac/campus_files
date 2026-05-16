@@ -328,7 +328,22 @@ const toggleAbo = async () => {
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="h-full flex flex-col bg-white dark:bg-gray-900 p-6 rounded-[2rem] border border-slate-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 hover:border-green-200 dark:hover:border-green-500 transition-colors">
               <p class="text-sm font-bold text-slate-400 dark:text-gray-500 mb-2">Dozent</p>
-              <p class="font-bold text-slate-800 dark:text-gray-100 text-lg">{{ modulDaten.dozent }}</p>
+
+              <!--Verlinkung von Kurs zu Dozent: -->
+              <NuxtLink
+                  v-if="aktuelleDozentId"
+                  :to="`/lecturers/${aktuelleDozentId}`"
+                  class="font-bold text-slate-800 dark:text-gray-100 text-lg hover:text-green-600 dark:hover:text-green-400 transition-colors"
+              >
+                {{ modulDaten.dozent }}
+              </NuxtLink>
+
+              <p
+                  v-else
+                  class="font-bold text-slate-800 dark:text-gray-100 text-lg"
+              >
+                {{ modulDaten.dozent }}
+              </p>
 
               <div class="flex text-amber-400 my-2 text-lg">
                 {{ generiereSterne(modulDaten.bewertungDozent) }}
