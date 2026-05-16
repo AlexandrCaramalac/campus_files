@@ -7,6 +7,7 @@
 const goToLogin = () => {
   navigateTo('/login')
 }
+
 </script>
 
 <template>

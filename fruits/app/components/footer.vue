@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const user = useSupabaseUser()
+const colorMode = useColorMode()
 
 const isDark = ref(false)
 
@@ -20,7 +21,7 @@ const toggleDarkMode = () => {
 
 <template>
   <footer
-      class="fixed bottom-0 left-0 w-full z-50
+      class="w-full z-50
            bg-gray-900 dark:bg-gray-950
            text-gray-300 dark:text-gray-400
            py-2 md:py-4 border-t border-gray-800"
@@ -96,12 +97,12 @@ const toggleDarkMode = () => {
           </a>
 
           <button
-              @click="toggleDarkMode"
+              @click="colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'"
               class="text-lg text-gray-500 dark:text-gray-400
-                   hover:text-white transition-all duration-300"
+                  hover:text-white transition-all duration-300"
               aria-label="Darkmode umschalten"
           >
-            {{ isDark ? '☀️' : '🌙' }}
+            {{ colorMode.value === 'dark' ? '🌙' : '☀️' }}
           </button>
 
         </div>

@@ -38,6 +38,13 @@ async function uploadFile() {
     return;
   }
 
+  const currentYear = new Date().getFullYear();
+  if (Number(selectedJahr.value) > currentYear) {
+    uploadStatus.value = 'error';
+    uploadMessage.value = 'Woah - Ein Zeitreisender!';
+    return;
+  }
+
   isUploading.value = true;
   uploadMessage.value = '';
   uploadStatus.value = '';

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+const colorMode = useColorMode()
 
 const selectedAvatar = ref("")
 const newPassword = ref("")
@@ -10,6 +11,16 @@ const confirmPassword = ref("")
 const message = ref("")
 const errorMessage = ref("")
 const currentAvatar = ref("")
+const currentName = ref("")
+
+const themeLabel = computed(() => colorMode.value === 'dark' ? 'Dark' : 'Light')
+const displayName = computed(() => {
+  return currentName.value || user.value?.user_metadata?.full_name || 'Dein Profil'
+})
+
+const toggleTheme = () => {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+}
 
 const avatars = [
   "/avatars/affe.png",
@@ -50,8 +61,8 @@ const saveAvatar = async () => {
 
 onMounted(async () => {
   try {
-    // Dem Fetch-Aufruf sagen, dass ein Objekt mit einem String 'avatar' zurückkommt
-    const res = await $fetch<{ avatar: string }>('/api/profile/avatar')
+    // Dem Fetch-Aufruf sagen, dass ein Objekt mit einem String 'avatar' und optionalem Namen zurückkommt
+    const res = await $fetch<{ avatar: string; name?: string }>('/api/profile/avatar')
     
     // Prüfen, ob res und res.avatar existieren
     if (res?.avatar) {
@@ -59,6 +70,8 @@ onMounted(async () => {
     } else {
       currentAvatar.value = '/avatars/affe.png'
     }
+
+    currentName.value = res?.name || ''
   } catch (e) {
     console.error("Avatar Load Error:", e)
   }
@@ -126,15 +139,35 @@ const changePassword = async () => {
       >
         Mein Profil
       </h1>
-      <div class="flex items-center gap-6 mb-8 ml-2">
-        <img
-          :src="currentAvatar || '/avatars/affe.png'"
-          alt="Profilbild"
-          class="w-24 h-24 rounded-full object-cover border-4 border-teal-400 shadow"
-        />
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-8 ml-2">
+        <div class="flex items-center gap-6">
+          <img
+            :src="currentAvatar || '/avatars/affe.png'"
+            alt="Profilbild"
+            class="w-24 h-24 rounded-full object-cover border-4 border-teal-400 shadow"
+          />
 
-        <div>
-          <p class="text-slate-500">Dein aktuelles Profilbild</p>
+          <div>
+            <p class="text-2xl font-bold text-slate-800 dark:text-gray-100">
+              {{ displayName }}
+            </p>
+            <p class="text-slate-500 dark:text-gray-400">
+              Hier kannst du dein Profilbild und Theme einstellen.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <p class="text-slate-700 dark:text-gray-100 font-medium">
+            Aktueller Modus: <span class="font-semibold">{{ themeLabel }}</span>
+          </p>
+          <button
+              @click="toggleTheme"
+              class="w-full md:w-auto bg-teal-500 text-white px-6 py-3 rounded-xl
+                     hover:bg-teal-600 transition-colors duration-300"
+          >
+            {{ colorMode.value === 'dark' ? 'Zu Light wechseln' : 'Zu Dark wechseln' }}
+          </button>
         </div>
       </div>
 

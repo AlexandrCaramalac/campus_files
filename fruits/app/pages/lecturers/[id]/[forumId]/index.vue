@@ -53,7 +53,7 @@ const kommentarAbsenden = async () => {
         <div class="absolute -top-20 -right-20 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
         <div class="relative z-10">
           <p class="text-green-100 font-bold text-sm uppercase tracking-wider mb-2">Diskussion</p>
-          <h1 class="text-2xl md:text-3xl font-black text-white">
+          <h1 class="text-2xl md:text-3xl font-black text-white" style="overflow-wrap:anywhere;">
             {{ beitrag?.thema || 'Beitrag wird geladen...' }}
           </h1>
           <div class="flex items-center gap-2 mt-2" v-if="beitrag">
@@ -119,7 +119,7 @@ const kommentarAbsenden = async () => {
                 }) }}
               </span>
             </div>
-            <p class="text-sm text-slate-700 dark:text-gray-200 leading-relaxed pl-11">{{ k.kommentar }}</p>
+            <p class="text-sm text-slate-700 dark:text-gray-200 leading-relaxed pl-11" style="overflow-wrap:anywhere;">{{ k.kommentar }}</p>
           </div>
         </div>
 
@@ -132,8 +132,15 @@ const kommentarAbsenden = async () => {
               class="w-full p-3 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl text-sm text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-600 transition-colors duration-300"
               rows="4"
               placeholder="Schreib einen Kommentar..."
+              maxlength="1000"
               :disabled="sendet"
             />
+            <div class="flex justify-between items-center mt-2">
+              <div></div>
+              <p v-if="neuerKommentar.length > 0" class="text-xs font-medium transition-colors" :class="neuerKommentar.length >= 900 ? 'text-orange-500 dark:text-orange-400' : 'text-slate-400 dark:text-gray-500'">
+                {{ neuerKommentar.length }}/1000
+              </p>
+            </div>
             <button
               @click="kommentarAbsenden"
               :disabled="sendet || !neuerKommentar.trim()"

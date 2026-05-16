@@ -48,10 +48,24 @@ export default eventHandler(async (event) => {
   // @ts-ignore
   // maps the data to include course ids and course names
 // @ts-ignore
-  const data_courses = (data_courses_unmapped ?? [])
-      .map((e: any) => e.kurs)
-      .filter(Boolean)
-      .sort((a: any, b: any) => a.name.localeCompare(b.name));
+  const data_courses_with_rating = await Promise.all(
+  (data_courses_unmapped ?? []).map(async (entry: any) => {
+    const kurs = entry.kurs;
+    if (!kurs) return null;
+    const { data: bewertung } = await client
+    // @ts-ignore
+      .rpc("get_kurs_ratings", { p_kurs_id: kurs.id }).single();
+    return {
+      ...kurs, 
+      // @ts-ignore
+      gesamtbewertung: bewertung?.gesamtbewertung ?? null,
+    };
+  }));
+
+  const data_courses = data_courses_with_rating
+  .filter(Boolean)
+  .sort((a: any, b: any) => a.name.localeCompare(b.name));
+
   return {
     dozent: data_lecturer,
     bewertungen: data_ratings,

@@ -33,6 +33,34 @@ const diskussionPosten = async () => {
 // NEU: Steuerung für das Bewertungs-Pop-up
 const zeigeDozentBewertung = ref(false)
 
+const zeigeKursBewertung = ref(false)
+const zuBewertendenKursId = ref(null)
+const kursBewertungsFehler = ref('')
+
+const kursBewertungStarten = async (kursId) => {
+  kursBewertungsFehler.value = ''
+
+  if (!user.value) {
+    kursBewertungsFehler.value = 'Du musst angemeldet sein, um eine Bewertung abzugeben.'
+    return
+  }
+
+  try {
+    const { alreadyRated } = await $fetch(`/api/kurse/bewertung/check?kursID=${kursId}`)
+
+    if (alreadyRated) {
+      kursBewertungsFehler.value = 'Du hast diesen Kurs bereits bewertet.'
+      return
+    }
+
+    zuBewertendenKursId.value = kursId
+    zeigeKursBewertung.value = true
+  } catch (error) {
+    console.error('Fehler beim Prüfen der Kursbewertung:', error)
+    kursBewertungsFehler.value = 'Bewertung konnte nicht geprüft werden.'
+  }
+}
+
 const datenNeuLaden = async () => {
   await refreshLecturer()
 }
@@ -42,6 +70,11 @@ const generiereSterne = (wert) => {
   if (!wert || isNaN(wert)) return '☆☆☆☆☆';
   const gerundet = Math.round(wert);
   return '★'.repeat(gerundet) + '☆'.repeat(5 - gerundet);
+}
+
+const truncateText = (text, maxLength = 200) => {
+  if (!text) return ''
+  return text.length > maxLength ? text.slice(0, maxLength).trimEnd() + '…' : text
 }
 
 </script>
@@ -151,21 +184,58 @@ const generiereSterne = (wert) => {
           <!-- KURSE -->
           <section class="bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl shadow-blue-900/5 dark:shadow-black/40 border border-slate-100 dark:border-gray-700 transition-colors duration-300">
             <div class="p-8">
-
-              <h2 class="text-xl font-extrabold text-slate-700 dark:text-gray-100 uppercase tracking-widest mb-6">
+              <h2 class="text-xl font-extrabold text-slate-700 dark:text-gray-100 uppercase tracking-widest mb-4">
                 Unterrichtete Kurse
               </h2>
 
-              <!--Verlinkung zu den Kursen-->
-              <NuxtLink
-                  v-for="course in lecturer?.kurse"
-                  :key="course.id"
-                  :to="`/courses/${course.id}`"
-                  class="block p-4 bg-slate-50 dark:bg-gray-800 rounded-xl font-semibold hover:bg-green-50 dark:hover:bg-gray-700 transition-colors text-slate-800 dark:text-gray-100"
-              >
-                {{ course.name }}
-              </NuxtLink>
+              <!-- Fehlermeldung -->
+              <div v-if="kursBewertungsFehler" class="mb-4">
+                <p class="text-sm font-semibold text-red-500 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3">
+                  {{ kursBewertungsFehler }}
+                </p>
+              </div>
 
+              <div class="flex flex-col gap-3">
+
+                <div v-if="!lecturer?.kurse?.length" class="text-slate-500 dark:text-gray-400 text-sm">
+                  Keine Kurse gefunden.
+                </div>
+
+                <div
+                  v-for="kurs in lecturer?.kurse"
+                  :key="kurs.id"
+                  class="flex items-center justify-between p-4 bg-slate-50 dark:bg-gray-800 rounded-xl border border-transparent dark:border-gray-700 hover:border-green-100 dark:hover:border-green-500 transition-colors"
+                >
+                  <!-- Name + Sterne -->
+                  <NuxtLink
+                    :to="`/courses/${kurs.id}`"
+                    class="flex flex-col gap-1 flex-1 min-w-0"
+                  >
+                    <p class="font-bold text-slate-800 dark:text-gray-100 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                      {{ kurs.name }}
+                    </p>
+                    <div class="flex items-center gap-2">
+                      <span class="text-amber-400 text-sm leading-none">
+                        {{ generiereSterne(kurs.gesamtbewertung) }}
+                      </span>
+                      <span class="text-xs font-semibold text-slate-500 dark:text-gray-400">
+                        {{ (kurs.gesamtbewertung == null || isNaN(kurs.gesamtbewertung))
+                            ? '-'
+                            : Number(kurs.gesamtbewertung).toFixed(1) }}
+                      </span>
+                    </div>
+                  </NuxtLink>
+
+                  <!-- Bewerten-Button -->
+                  <button
+                    @click="kursBewertungStarten(kurs.id)"
+                    class="ml-4 flex-shrink-0 bg-white dark:bg-gray-900 hover:bg-blue-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-bold py-2 px-4 rounded-xl text-xs transition-colors border border-slate-100 dark:border-gray-700"
+                  >
+                    Bewerten
+                  </button>
+                </div>
+
+              </div>
             </div>
           </section>
 
@@ -190,7 +260,9 @@ const generiereSterne = (wert) => {
               :class="['block group', index > 0 ? 'border-t border-slate-100 dark:border-gray-700 pt-4' : '']"
             >
               <div class="flex items-start justify-between gap-2 mb-2">
-                <p class="font-bold text-sm text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">{{ item.thema }}</p>
+                <p class="font-bold text-sm text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" style="overflow-wrap:anywhere;">
+                  {{ truncateText(item.thema) }}
+                </p>
                 <span
                   v-if="item.kommentar_dozent?.[0]?.count > 0"
                   class="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-blue-500 mt-1"
@@ -224,8 +296,15 @@ const generiereSterne = (wert) => {
                 class="w-full p-4 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl text-sm text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-300"
                 rows="3"
                 placeholder="Stell eine Frage..."
+                maxlength="1000"
                 :disabled="postet"
               ></textarea>
+              <div class="flex justify-between items-center mt-2">
+                <div></div>
+                <p v-if="neuesDiskussionsThema.length > 0" class="text-xs font-medium transition-colors" :class="neuesDiskussionsThema.length >= 900 ? 'text-orange-500 dark:text-orange-400' : 'text-slate-400 dark:text-gray-500'">
+                  {{ neuesDiskussionsThema.length }}/1000
+                </p>
+              </div>
               <button
                 @click="diskussionPosten"
                 :disabled="postet || !neuesDiskussionsThema.trim()"
@@ -259,5 +338,12 @@ const generiereSterne = (wert) => {
       @gespeichert="zeigeDozentBewertung = false; datenNeuLaden()" 
     />
   </div>
+  <div v-if="zeigeKursBewertung" class="fixed inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <BewertungKurs
+    :kursId="zuBewertendenKursId"
+    @abbrechen="zeigeKursBewertung = false"
+    @gespeichert="zeigeKursBewertung = false; datenNeuLaden()"
+  />
+</div>
 
 </template>

@@ -14,7 +14,7 @@ export default eventHandler(async (event) => {
 
   const { data, error } = await client
     .from('profile')
-    .select('avatar')
+    .select('avatar,name')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -26,5 +26,6 @@ export default eventHandler(async (event) => {
   }
 
   // @ts-ignore
-  return { avatar: data?.avatar ?? 'affe'}
+  return {avatar: data?.avatar ?? 'affe', name: data?.name ?? null
+  }
 })

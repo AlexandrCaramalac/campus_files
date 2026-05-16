@@ -70,7 +70,7 @@ const kommentarAbsenden = async () => {
               <p class="text-green-100 dark:text-green-200 font-bold text-sm uppercase tracking-wider mb-2">
                 {{ formatDateityp(datei.typ) }}
               </p>
-              <h1 class="text-2xl md:text-3xl font-black text-white break-all">
+              <h1 class="text-2xl md:text-3xl font-black text-white break-all" style="overflow-wrap:anywhere;">
                 {{ datei.dateiname }}
               </h1>
               <p class="mt-2 text-green-50 dark:text-gray-200 text-sm font-medium">
@@ -143,7 +143,7 @@ const kommentarAbsenden = async () => {
                     }) }}
                   </span>
                 </div>
-                <p class="text-sm text-slate-700 leading-relaxed pl-11">{{ k.kommentar }}</p>
+                <p class="text-sm text-slate-700 leading-relaxed pl-11" style="overflow-wrap:anywhere;">{{ k.kommentar }}</p>
               </div>
             </div>
 
@@ -156,8 +156,15 @@ const kommentarAbsenden = async () => {
                     class="w-full p-3 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl text-sm text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-green-300 dark:focus:ring-green-500 focus:border-transparent transition"
                     rows="3"
                     placeholder="Schreib einen Kommentar..."
+                    maxlength="1000"
                     :disabled="sendet"
                 />
+                <div class="flex justify-between items-center mt-2">
+                  <div></div>
+                  <p v-if="neuerKommentar.length > 0" class="text-xs font-medium transition-colors" :class="neuerKommentar.length >= 900 ? 'text-orange-500 dark:text-orange-400' : 'text-slate-400 dark:text-gray-500'">
+                    {{ neuerKommentar.length }}/1000
+                  </p>
+                </div>
                 <button
                     @click="kommentarAbsenden"
                     :disabled="sendet || !neuerKommentar.trim()"

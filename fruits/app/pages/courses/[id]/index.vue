@@ -11,6 +11,17 @@ const { data: course, refresh: refreshCourse } = await useFetch('/api/kurse/' + 
 const { data: forums, refresh: refreshForums } = await useFetch('/api/kurse/foren/' + urlId)
 const { data: files, refresh: refreshFiles } = await useFetch('/api/dateien/' + urlId)
 
+// Bewertungskriterien für den zusammengefassten Kasten
+const bewertungsKriterien = computed(() => {
+  const b = course.value?.bewertungen
+  return [
+    { label: 'Schwierigkeit', wert: b?.schwierigkeit },
+    { label: 'Aufwand',       wert: b?.aufwand },
+    { label: 'Nutzen',        wert: b?.nutzen },
+    { label: 'Praxisbezug',   wert: b?.praxisbezug },
+  ]
+})
+
 const user = useSupabaseUser()
 const neuesDiskussionsThema = ref('')
 const postet = ref(false)
@@ -45,6 +56,7 @@ const tabs = ['Altklausuren', 'Karteikarten', 'Mitschriften', 'Alle Ressourcen']
 // --- Steuerung für die Bewertungs-Popups ---
 const zeigeKursBewertung = ref(false)
 const zeigeDozentBewertung = ref(false)
+const zuBewertendenDozentId = ref(null)
 const bewertungsFehler = ref('')
 
 // Die ID des aktuellen Dozenten sicher auslesen
@@ -76,7 +88,7 @@ const kursBewertungStarten = async () => {
 }
 
 // Fehlermeldung erscheint, sobald jemand mehr als einmal bewerten möchte:
-const dozentBewertungStarten = async () => {
+const dozentBewertungStarten = async (dozentId) => {
   bewertungsFehler.value = ''
 
   if (!user.value) {
@@ -84,14 +96,14 @@ const dozentBewertungStarten = async () => {
     return
   }
 
-  if (!aktuelleDozentId.value) {
+  if (!dozentId) {
     bewertungsFehler.value = 'Zu diesem Kurs ist kein Dozent hinterlegt.'
     return
   }
 
   try {
     const { alreadyRated } = await $fetch(
-        `/api/dozenten/bewertung/check?dozentID=${aktuelleDozentId.value}`
+      `/api/dozenten/bewertung/check?dozentID=${dozentId}`
     )
 
     if (alreadyRated) {
@@ -99,6 +111,7 @@ const dozentBewertungStarten = async () => {
       return
     }
 
+    zuBewertendenDozentId.value = dozentId
     zeigeDozentBewertung.value = true
   } catch (error) {
     console.error('Fehler beim Prüfen der Dozentenbewertung:', error)
@@ -139,6 +152,10 @@ const modulDaten = computed(() => {
     bewertungModul: bewertungen?.gesamtbewertung || 'Keine Bewertungen',
     bewertungDozent: dozentBewertung
   }
+})
+
+const dozentenListe = computed(() => {
+  return course.value?.dozenten?.map(item => item?.dozent).filter(Boolean) || []
 })
 
 // 5. Dateien aus der API aufbereiten
@@ -242,6 +259,11 @@ const generiereSterne = (wert) => {
   return sterneText;
 }
 
+const truncateText = (text, maxLength = 200) => {
+  if (!text) return ''
+  return text.length > maxLength ? text.slice(0, maxLength).trimEnd() + '…' : text
+}
+
 // --- ABONNEMENT LOGIK ---
 const { data: aboData, refresh: refreshAbos } = await useFetch("/api/bekommt-updates")
 
@@ -289,7 +311,8 @@ const toggleAbo = async () => {
       <header class="rounded-[2.5rem] bg-gradient-to-br from-green-400 to-blue-600 dark:from-green-700 dark:to-blue-900 p-6 shadow-lg shadow-blue-900/10 dark:shadow-black/50 mb-8 relative overflow-hidden text-center">
         <div class="absolute -top-20 -right-20 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
 
-        <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight text-white relative z-10">
+        <h1 class="text-4xl md:text-5xl font-black uppercase tracking-tight text-white relative z-10 break-words whitespace-normal"
+            style="overflow-wrap:anywhere; word-break:break-word;">
           {{ modulDaten.name }}
         </h1>
         <p class="mt-4 text-lg text-green-50 dark:text-gray-200 max-w-none mx-auto relative z-10 font-medium leading-relaxed">
@@ -380,86 +403,124 @@ const toggleAbo = async () => {
           </section>
 
           <!-- Bereich: Dozent, Kurs Info & Bewertungen -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="h-full flex flex-col bg-white dark:bg-gray-900 p-6 rounded-[2rem] border border-slate-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 hover:border-green-200 dark:hover:border-green-500 transition-colors">
-              <p class="text-sm font-bold text-slate-400 dark:text-gray-500 mb-2">Dozent</p>
+          <!-- Bereich: Bewertungen & Kurs-ID -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-              <!--Verlinkung von Kurs zu Dozent: -->
-              <NuxtLink
-                  v-if="aktuelleDozentId"
-                  :to="`/lecturers/${aktuelleDozentId}`"
-                  class="font-bold text-slate-800 dark:text-gray-100 text-lg hover:text-green-600 dark:hover:text-green-400 transition-colors"
-              >
-                {{ modulDaten.dozent }}
-              </NuxtLink>
+          <!-- Zusammengefasste Bewertungskarte (2 Spalten) -->
+          <div class="md:col-span-2 flex flex-col bg-white dark:bg-gray-900 p-6 rounded-[2rem] border border-slate-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 hover:border-green-200 dark:hover:border-green-500 transition-colors">
 
-              <p
-                  v-else
-                  class="font-bold text-slate-800 dark:text-gray-100 text-lg"
-              >
-                {{ modulDaten.dozent }}
-              </p>
+            <p class="text-sm font-bold text-slate-400 dark:text-gray-500 mb-1">Kurs</p>
+            <p class="font-bold text-slate-800 dark:text-gray-100 text-lg break-words whitespace-normal"
+               style="overflow-wrap:anywhere; word-break:break-word;">{{ modulDaten.name }}</p>
 
-              <div class="flex text-amber-400 my-2 text-lg">
-                {{ generiereSterne(modulDaten.bewertungDozent) }}
-              </div>
-
-              <p class="text-xs font-semibold text-slate-500 dark:text-gray-400">
-                Rating: {{ isNaN(modulDaten.bewertungDozent) ? '-' : Number(modulDaten.bewertungDozent).toFixed(1) }}
-              </p>
-              <button
-                  v-if="aktuelleDozentId"
-                  @click="dozentBewertungStarten"
-                  class="mt-auto w-full bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
-                Dozent bewerten
-              </button>
+            <!-- Gesamtbewertung prominent -->
+            <div class="flex items-center gap-3 my-3">
+              <span class="text-amber-400 text-xl leading-none">{{ generiereSterne(modulDaten.bewertungModul) }}</span>
+              <span class="text-sm font-semibold text-slate-500 dark:text-gray-400">
+                {{ isNaN(modulDaten.bewertungModul) ? '-' : Number(modulDaten.bewertungModul).toFixed(1) }}
+                <span class="text-xs font-bold text-slate-400 dark:text-gray-600 ml-1">Gesamt</span>
+              </span>
             </div>
 
-            <div class="h-full flex flex-col bg-white dark:bg-gray-900 p-6 rounded-[2rem] border border-slate-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 hover:border-green-200 dark:hover:border-green-500 transition-colors">
-              <p class="text-sm font-bold text-slate-400 dark:text-gray-500 mb-2">Kurs</p>
-              <p class="font-bold text-slate-800 dark:text-gray-100 text-lg line-clamp-1">{{ modulDaten.name }}</p>
+            <div class="border-t border-slate-100 dark:border-gray-700 mb-4"></div>
 
-              <div class="flex text-amber-400 my-2 text-lg">
-                {{ generiereSterne(modulDaten.bewertungModul) }}
+            <!-- 4 Einzelkriterien im 2×2-Grid -->
+            <div class="grid grid-cols-2 gap-x-6 gap-y-4 flex-1">
+              <div v-for="k in bewertungsKriterien" :key="k.label">
+                <p class="text-xs font-bold text-slate-400 dark:text-gray-500 mb-1">{{ k.label }}</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-amber-400 text-base leading-none">{{ generiereSterne(k.wert) }}</span>
+                  <span class="text-xs font-semibold text-slate-500 dark:text-gray-400">
+                    {{ (k.wert == null || isNaN(k.wert)) ? '-' : Number(k.wert).toFixed(1) }}
+                  </span>
+                </div>
               </div>
-
-              <p class="text-xs font-semibold text-slate-500 dark:text-gray-400">
-                Rating: {{ isNaN(modulDaten.bewertungModul) ? '-' : Number(modulDaten.bewertungModul).toFixed(1) }}
-              </p>
-
-              <button
-                  @click="kursBewertungStarten"
-                  class="mt-auto w-full bg-slate-50 dark:bg-gray-800 hover:bg-blue-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
-                Kurs bewerten
-              </button>
             </div>
 
-            <!-- Dritte Karte: Kurs-ID & Abonnieren -->
-            <div class="bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-[2rem] border border-green-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 flex flex-col items-center text-center transition-colors duration-300">
+            <button
+                @click="kursBewertungStarten"
+                class="mt-5 w-full bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
+              Kurs bewerten
+            </button>
+          </div>
 
-              <div class="my-auto">
-                <p class="text-sm font-bold text-green-600 dark:text-green-500 mb-1 uppercase tracking-wider">Kurs-ID</p>
-                <p class="text-2xl font-black text-blue-900 dark:text-blue-100">{{ modulDaten.id }}</p>
+          <!-- Kurs-ID & Abonnieren (unverändert) -->
+          <div class="bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 p-6 rounded-[2rem] border border-green-100 dark:border-gray-700 shadow-lg shadow-blue-900/5 dark:shadow-black/40 flex flex-col items-center text-center transition-colors duration-300">
+            <div class="my-auto">
+              <p class="text-sm font-bold text-green-600 dark:text-green-500 mb-1 uppercase tracking-wider">Kurs-ID</p>
+              <p class="text-2xl font-black text-blue-900 dark:text-blue-100">{{ modulDaten.id }}</p>
+            </div>
+            <button
+                @click="toggleAbo"
+                :disabled="togglingAbo"
+                class="mt-auto w-full py-2 px-4 rounded-xl text-sm font-bold border transition-all duration-200 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-slate-200 dark:border-gray-600 hover:bg-teal-50 hover:text-teal-600 hover:border-teal-200 dark:hover:bg-teal-900/20 dark:hover:text-teal-400 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span v-if="!istAbonniert" class="text-lg leading-none">+</span>
+              <span v-else class="text-lg leading-none">✓</span>
+              <span>{{ istAbonniert ? 'Abonniert' : 'Abonnieren' }}</span>
+            </button>
+          </div>
+
+          <!-- Fehlermeldung -->
+          <div v-if="bewertungsFehler" class="md:col-span-3">
+            <p class="text-sm font-semibold text-red-500 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3">
+              {{ bewertungsFehler }}
+            </p>
+          </div>
+
+        </div>
+
+        <section class="bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl shadow-blue-900/5 dark:shadow-black/40 border border-slate-100 dark:border-gray-700 transition-colors duration-300">
+          <div class="p-8">
+            <h2 class="text-sm font-extrabold text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-4">
+              Lehrende zu diesem Kurs
+            </h2>
+
+            <div class="flex flex-col gap-3">
+
+              <!-- Leerzustand -->
+              <div v-if="dozentenListe.length === 0" class="text-slate-500 dark:text-gray-400 text-sm">
+                Zu diesem Kurs sind derzeit keine Lehrenden hinterlegt.
               </div>
 
-              <button
-                  @click="toggleAbo"
-                  :disabled="togglingAbo"
-                  class="mt-auto w-full py-2 px-4 rounded-xl text-sm font-bold border transition-all duration-200 flex justify-center items-center gap-2 bg-white dark:bg-gray-800 text-slate-500 dark:text-gray-400 border-slate-200 dark:border-gray-600 hover:bg-teal-50 hover:text-teal-600 hover:border-teal-200 dark:hover:bg-teal-900/20 dark:hover:text-teal-400 disabled:opacity-50 disabled:cursor-not-allowed"
+              <!-- Dozenten-Karte -->
+              <div
+                v-for="dozent in dozentenListe"
+                :key="dozent.id"
+                class="flex items-center justify-between p-4 bg-slate-50 dark:bg-gray-800 rounded-xl border border-transparent dark:border-gray-700 hover:border-green-100 dark:hover:border-green-500 transition-colors"
               >
-                <span v-if="!istAbonniert" class="text-lg leading-none">+</span>
-                <span v-else class="text-lg leading-none">✓</span>
-                <span>{{ istAbonniert ? 'Abonniert' : 'Abonnieren' }}</span>
-              </button>
+                <!-- Name + Sterne -->
+                <NuxtLink
+                  :to="`/lecturers/${dozent.id}`"
+                  class="flex flex-col gap-1 flex-1 min-w-0"
+                >
+                  <p class="font-bold text-slate-800 dark:text-gray-100 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                    {{ dozent.vorname }} {{ dozent.nachname }}
+                  </p>
+                  <div class="flex items-center gap-2">
+                    <span class="text-amber-400 text-sm leading-none">
+                      {{ generiereSterne(dozent.gesamtbewertung) }}
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500 dark:text-gray-400">
+                      {{ (dozent.gesamtbewertung == null || isNaN(dozent.gesamtbewertung))
+                          ? '-'
+                          : Number(dozent.gesamtbewertung).toFixed(1) }}
+                    </span>
+                  </div>
+                </NuxtLink>
 
-            </div>
+                <!-- Bewerten-Button -->
+                <button
+                  @click="dozentBewertungStarten(dozent.id)"
+                  class="ml-4 flex-shrink-0 bg-white dark:bg-gray-900 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-2 px-4 rounded-xl text-xs transition-colors border border-slate-100 dark:border-gray-700"
+                >
+                  Bewerten
+                </button>
+              </div>
 
-            <div v-if="bewertungsFehler" class="md:col-span-3">
-              <p class="text-sm font-semibold text-red-500 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3">
-                {{ bewertungsFehler }}
-              </p>
             </div>
           </div>
+        </section>
 
         </div> <!-- Ende LINKE SPALTE -->
 
@@ -482,7 +543,9 @@ const toggleAbo = async () => {
                 :class="['block group', index > 0 ? 'border-t border-slate-100 dark:border-gray-700 pt-4' : '']"
             >
               <div class="flex items-start justify-between gap-2 mb-2">
-                <p class="font-bold text-sm text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">{{ item.thema }}</p>
+                <p class="font-bold text-sm text-slate-800 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" style="overflow-wrap:anywhere;" :title="item.thema">
+                  {{ truncateText(item.thema) }}
+                </p>
                 <span
                     v-if="item.kommentar_kurs?.[0]?.count > 0"
                     class="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-blue-500 mt-1"
@@ -516,8 +579,15 @@ const toggleAbo = async () => {
                   class="w-full p-4 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl text-sm text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-300"
                   rows="3"
                   placeholder="Stell eine Frage..."
+                  maxlength="1000"
                   :disabled="postet"
               ></textarea>
+              <div class="flex justify-between items-center mt-2">
+                <div></div>
+                <p v-if="neuesDiskussionsThema.length > 0" class="text-xs font-medium transition-colors" :class="neuesDiskussionsThema.length >= 900 ? 'text-orange-500 dark:text-orange-400' : 'text-slate-400 dark:text-gray-500'">
+                  {{ neuesDiskussionsThema.length }}/1000
+                </p>
+              </div>
               <button
                   @click="diskussionPosten"
                   :disabled="postet || !neuesDiskussionsThema.trim()"
@@ -555,7 +625,7 @@ const toggleAbo = async () => {
 
   <div v-if="zeigeDozentBewertung" class="fixed inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <BewertungProf
-        :dozentId="aktuelleDozentId"
+        :dozentId="zuBewertendenDozentId"
         @abbrechen="zeigeDozentBewertung = false"
         @gespeichert="zeigeDozentBewertung = false; datenNeuLaden()"
     />

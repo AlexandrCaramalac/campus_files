@@ -34,7 +34,7 @@ const speichern = async () => {
       .from('bewertung_kurs') // <-- Richtige Tabelle für den Kurs
       .insert({
         kursID: props.kursId,
-        nutzerID: user.value.sub,    // <-- HIER AUCH DIE LÖSUNG: .sub statt .id nutzen!
+        nutzerID: user.value.sub,    // <-- HIER AUCH DIE LÖSUNG: .sub statt .id nutzen! (Warum?)
         aufwand: aufwand.value,
         nutzen: nutzen.value,
         schwierigkeit: schwierigkeit.value,
