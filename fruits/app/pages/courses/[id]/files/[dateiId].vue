@@ -91,7 +91,7 @@ const kommentarAbsenden = async () => {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           <!-- PDF Viewer -->
-          <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl shadow-green-900/5 dark:shadow-black/40 border border-green-50 dark:border-gray-700 overflow-hidden transition-colors duration-300" style="height: 82vh;">
+          <div class="lg:col-span-2 bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl shadow-green-900/5 dark:shadow-black/40 border border-green-50 dark:border-gray-700 overflow-hidden transition-colors duration-300 h-[60vh] lg:h-[82vh]">
             <iframe
                 :src="`${pdfUrl}#toolbar=1&view=FitH`"
                 class="w-full h-full border-0"
@@ -101,7 +101,7 @@ const kommentarAbsenden = async () => {
           </div>
 
           <!-- Kommentare -->
-          <aside class="lg:col-span-1 bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl shadow-green-900/5 dark:shadow-black/40 border border-slate-100 dark:border-gray-700 flex flex-col overflow-hidden transition-colors duration-300" style="height: 82vh;">
+          <aside class="lg:col-span-1 bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl shadow-green-900/5 dark:shadow-black/40 border border-slate-100 dark:border-gray-700 flex flex-col overflow-hidden transition-colors duration-300 lg:h-[82vh]">
 
             <div class="p-5 bg-slate-50 dark:bg-gray-800 border-b border-slate-100 dark:border-gray-700 transition-colors duration-300">
               <h2 class="font-extrabold text-slate-700 dark:text-gray-100 uppercase tracking-widest text-sm">
@@ -113,7 +113,7 @@ const kommentarAbsenden = async () => {
             </div>
 
             <!-- Liste -->
-            <div class="flex-1 overflow-y-auto p-5 space-y-4">
+            <div class="lg:flex-1 lg:overflow-y-auto p-5 space-y-4">
               <div v-if="kommentare.length === 0" class="text-center py-12 text-slate-400 dark:text-gray-500">
                 <p class="text-3xl mb-2">💬</p>
                 <p class="font-medium text-sm">Noch keine Kommentare.</p>
