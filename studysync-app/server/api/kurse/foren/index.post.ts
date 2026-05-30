@@ -1,5 +1,6 @@
 import { serverSupabaseClient } from "#supabase/server"
 import { readBody } from "h3"
+import sanitizeHtml from "sanitize-html"
 
 export default eventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
@@ -12,14 +13,50 @@ export default eventHandler(async (event) => {
 
   const body = await readBody(event);
   const kursID = Number(body.kursID);
-  const thema = String(body.thema ?? "");
+  let thema = String(body.thema ?? "");
 
   if (!kursID || !thema.trim()) {
     throw createError({ statusCode: 400, statusMessage: "Fehlende Daten" });
   }
 
+  // 1) Länge prüfen
+  if (thema.length > 200) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Thema zu lang"
+    });
+  }
+
+  // 2) HTML entfernen
+  const cleanThema = sanitizeHtml(thema.trim(), {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+
+  // 3) Schimpfwortfilter
+  const bannedWords = ["idiot", "arsch", "fuck"];
+
+  const normalized = cleanThema
+    .toLowerCase()
+    .replace(/[^a-zA-Zäöüß0-9 ]/g, "");
+
+  const containsBadWord = bannedWords.some(word =>
+    normalized.includes(word)
+  );
+
+  if (containsBadWord) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Unangemessener Inhalt"
+    });
+  }
+
   const { data, error } = await (client.from("forum_kurs") as any)
-    .insert({ kursID, nutzerID: userId, thema: thema.trim() })
+    .insert({
+      kursID,
+      nutzerID: userId,
+      thema: cleanThema
+    })
     .select("*, profile(name)")
     .single();
 
