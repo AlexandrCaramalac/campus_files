@@ -208,7 +208,7 @@ async function createAccount() {
     showMessage(error.message, true)
   }
   else {
-    showMessage("Account erstellt! Bitte E-Mail bestätigen.")
+    showMessage("Account erstellt! Wir haben dir einen Bestätigungslink geschickt! Bitte schaue auch in deinem Spam-Ordner nach.")
     password.value = ""
     passwordConfirm.value = ""
   }
