@@ -506,7 +506,7 @@ const toggleAbo = async () => {
 
             <button
                 @click="kursBewertungStarten"
-                class="mt-5 w-full bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-100 dark:border-gray-700">
+                class="mt-5 w-full bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-2 rounded-xl text-sm transition-colors border border-slate-250 dark:border-gray-700">
               Kurs bewerten
             </button>
           </div>

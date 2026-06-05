@@ -218,7 +218,7 @@ const truncateText = (text, maxLength = 200) => {
 
                 <button 
                   @click="dozentBewertungStarten()" 
-                  class="w-full max-w-sm bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-3 rounded-xl transition-colors border border-slate-100 dark:border-gray-700">
+                  class="w-full max-w-sm bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-3 rounded-xl transition-colors border border-slate-250 dark:border-gray-700">
                   Dozent bewerten
                 </button>
               </div>
