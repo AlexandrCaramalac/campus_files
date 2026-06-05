@@ -24,9 +24,21 @@ const faqs = [
         'desto einfacher wird das Lernen für alle.'
   },
   {
+    frage: 'Muss ich angemeldet sein, um StudySync zu nutzen?',
+    antwort: 'Ja, die meisten Inhalte von StudySync sind erst nach dem Login zugänglich. Dadurch soll sichergestellt werden, dass die Plattform vor allem von Studierenden genutzt wird.'
+  },
+  {
     frage: 'Wer kann Dateien hochladen?',
     antwort: 'Jeder, der bereit ist, seine Unterlagen zu teilen. Einfach den "Hochladen" Button nutzen und die Felder entsprechend ausfüllen. Uploads sind bis ' +
         '50 MB möglich.'
+  },
+  {
+    frage: 'Wie kann ich Dateien herunterladen?',
+    antwort: 'Wenn zu einem Modul Dateien vorhanden sind, kannst du diese in der Modulübersicht oder auf der jeweiligen Modulseite ansehen und herunterladen.'
+  },
+  {
+    frage: 'Wofür ist das Forum gedacht?',
+    antwort: 'Im Forum können Fragen zu Modulen, Lernmaterialien oder organisatorischen Themen gestellt und beantwortet werden. Es soll den Austausch zwischen Studierenden erleichtern.'
   },
   {
     frage: 'Wie funktionieren die Bewertungen?',
@@ -34,7 +46,16 @@ const faqs = [
         ' "Dozenten" gesucht und dort anhand eines Sternesystems bewertet werden. Ein Stern steht für die niedrigste, fünf Sterne für die höchste Bewertung. Dabei wird ' +
         'bewusst zwischen Modulen und Dozenten unterschieden, da sich Dozenten im Laufe der Zeit ändern können. Einzelne Bewertungen spiegeln stets subjektive Eindrücke ' +
         'wider, während die Gesamtbewertung einen aktuellen Überblick über die Qualität eines Kurses oder eines Dozenten geben soll.'
-  }
+  },
+  {
+    frage: 'Warum gibt es getrennte Bewertungen für Module und Dozenten?',
+    antwort: 'Module und Dozenten werden getrennt bewertet, weil ein Modul über mehrere Semester bestehen kann, während sich die lehrende Person ändern kann. So bleiben die Bewertungen übersichtlicher und aussagekräftiger.'
+  },
+  {
+    frage: 'Sind Bewertungen anonym?',
+    antwort: 'Bewertungen sollen subjektive Eindrücke wiedergeben und anderen Studierenden eine Orientierung geben. Sie sollten fair, sachlich und respektvoll formuliert werden.'
+  },
+
 ]
 
 /*
@@ -48,12 +69,7 @@ function toggle(index) {
 </script>
 
 <template>
-  <!--
-    FAQ-Seite:
-    Lightmode: heller Hintergrund
-    Darkmode: schwarzer Hintergrund
-    Footer fixieren: min-h-[calc(100vh-260px)]
-  -->
+
   <div
       class="min-h-[calc(100vh-260px)] bg-slate-50 dark:bg-black
            font-sans text-slate-800 dark:text-gray-100

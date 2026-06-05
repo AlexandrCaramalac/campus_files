@@ -166,7 +166,7 @@ const truncateText = (text, maxLength = 200) => {
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-slate-50 dark:bg-gray-800 p-5 rounded-2xl transition-colors duration-300">
-                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Verständlichkeit</p>
+                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Der/ Die Dozent*in drückt sich klar und verständlich aus.</p>
                   <div class="text-amber-400 text-lg my-1">
                     {{ generiereSterne(lecturer?.bewertungen?.verstaendlichkeit) }}
                   </div>
@@ -176,7 +176,7 @@ const truncateText = (text, maxLength = 200) => {
                 </div>
 
                 <div class="bg-slate-50 dark:bg-gray-800 p-5 rounded-2xl transition-colors duration-300">
-                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Struktur</p>
+                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Der/ Die Dozent*in hat eine klare Struktur und nutzt die Zeit für das Wesentliche.</p>
                   <div class="text-amber-400 text-lg my-1">
                     {{ generiereSterne(lecturer?.bewertungen?.struktur) }}
                   </div>
@@ -186,7 +186,7 @@ const truncateText = (text, maxLength = 200) => {
                 </div>
 
                 <div class="bg-slate-50 dark:bg-gray-800 p-5 rounded-2xl transition-colors duration-300">
-                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Engagement</p>
+                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Dem / Der Dozent*in scheint der Lernerfolg der Studierenden wichtig zu sein.</p>
                   <div class="text-amber-400 text-lg my-1">
                     {{ generiereSterne(lecturer?.bewertungen?.engagement) }}
                   </div>
@@ -196,7 +196,7 @@ const truncateText = (text, maxLength = 200) => {
                 </div>
 
                 <div class="bg-slate-50 dark:bg-gray-800 p-5 rounded-2xl transition-colors duration-300">
-                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Freundlichkeit</p>
+                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Der/ Die Dozent*in verhält sich den Studierenden gegenüber freundlich und respektvoll.</p>
                   <div class="text-amber-400 text-lg my-1">
                     {{ generiereSterne(lecturer?.bewertungen?.freundlichkeit) }}
                   </div>

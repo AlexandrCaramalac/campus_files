@@ -72,40 +72,40 @@ const speichern = async () => {
 
     <div class="space-y-6">
 
-      <!-- Verständlichkeit -->
+      <!-- Verständlichkeit -> Der/ Die Dozent*in drückt sich klar und verständlich aus -->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">
-          <span>Verständlichkeit</span>
+          <span>Der/ Die Dozent*in drückt sich klar und verständlich aus.</span>
           <span class="text-green-600 dark:text-green-400">{{ verstaendlichkeit}}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="verstaendlichkeit"
                class="w-full h-4 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-600 dark:accent-green-500">
       </div>
 
-      <!-- Struktur -->
+      <!-- Struktur -> Der/ Die Dozent*in hat eine klare Struktur und nutzt die Zeit für das Wesentliche -->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">
-          <span>Struktur</span>
+          <span>Der/ Die Dozent*in hat eine klare Struktur und nutzt die Zeit für das Wesentliche.</span>
           <span class="text-green-600 dark:text-green-400">{{ struktur}}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="struktur"
                class="w-full h-4 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-600 dark:accent-green-500">
       </div>
 
-      <!-- Engagement -->
+      <!-- Engagement -> Dem / Der Dozent*in scheint der Lernerfolg der Studierenden wichtig zu sein-->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">
-          <span>Engagement</span>
+          <span>Dem / Der Dozent*in scheint der Lernerfolg der Studierenden wichtig zu sein.</span>
           <span class="text-green-600 dark:text-green-400">{{ engagement }}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="engagement"
                class="w-full h-4 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-600 dark:accent-green-500">
       </div>
 
-      <!-- Freundlichkeit -->
+      <!-- Freundlichkeit -> Der/ Die Dozent*in verhält sich den Studierenden gegenüber freundlich und respektvoll-->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">
-          <span>Freundlichkeit</span>
+          <span>Der/ Die Dozent*in verhält sich den Studierenden gegenüber freundlich und respektvoll.</span>
           <span class="text-green-600 dark:text-green-400">{{ freundlichkeit }}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="freundlichkeit"
