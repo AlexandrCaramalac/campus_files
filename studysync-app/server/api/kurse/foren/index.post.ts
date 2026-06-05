@@ -19,8 +19,8 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Fehlende Daten" });
   }
 
-  // 1) Länge prüfen
-  if (thema.length > 200) {
+  
+  if (thema.length > 1000) {
     throw createError({
       statusCode: 400,
       statusMessage: "Thema zu lang"

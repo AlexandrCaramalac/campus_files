@@ -20,7 +20,7 @@ export default eventHandler(async (event) => {
   }
 
   // 1) Länge prüfen
-  if (thema.length > 200) {
+  if (thema.length > 1000) {
     throw createError({
       statusCode: 400,
       statusMessage: "Thema zu lang"
