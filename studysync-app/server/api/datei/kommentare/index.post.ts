@@ -10,16 +10,21 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: "Nicht autorisiert" });
   }
 
+
   const body = await readBody(event);
   const dateiID = Number(body.dateiID);
-  const kommentar = String(body.kommentar ?? "");
+  const kommentar = String(body.kommentar ?? "").trim();
 
-  if (!dateiID || !kommentar.trim()) {
+  if (!dateiID || !kommentar) {
     throw createError({ statusCode: 400, statusMessage: "Fehlende Daten" });
   }
 
+  if (kommentar.length > 1000) {
+    throw createError({ statusCode: 400, statusMessage: "Der Kommentar darf maximal 1000 Zeichen lang sein." });
+  }
+
   const { data, error } = await (client.from("kommentar_datei") as any)
-    .insert({ dateiID, nutzerID: userId, kommentar: kommentar.trim() })
+    .insert({ dateiID, nutzerID: userId, kommentar })
     .select("*, profile(name)")
     .single();
 

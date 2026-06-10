@@ -125,6 +125,19 @@ const firstName = ref("")
 const message = ref("")
 const isError = ref(false)
 
+
+const RESTRICT_EMAILS = false
+
+const ALLOWED_DOMAINS = [
+  "@uos.de",
+  "@uni-osnabrueck.de"
+]
+
+function istErlaubteEmail(email) {
+  const e = email.toLowerCase().trim()
+  return ALLOWED_DOMAINS.some(domain => e.endsWith(domain))
+}
+
 function showMessage(text, error = false) {
   message.value = text
   isError.value = error
@@ -144,14 +157,13 @@ async function istNameVergeben(name) {
   return vergeben
 }
 
-//Passwort Reset anfordern
+// Passwort Reset anfordern
 async function resetPassword() {
   if (!email.value || !istEmailGueltig(email.value)) {
     showMessage("Bitte gib eine gültige E-Mail-Adresse ein.", true)
     return
   }
 
-  // Erkennt automatisch, ob man lokal (localhost:3000) oder auf Vercel ist
   const redirectUrl = `${window.location.origin}/update-password`
 
   const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
@@ -182,6 +194,12 @@ async function createAccount() {
     return
   }
 
+  // FRONTEND DOMAIN CHECK
+  if (RESTRICT_EMAILS && !istErlaubteEmail(email.value)) {
+    showMessage("Nur Uni-E-Mail-Adressen (@uos.de oder @uni-osnabrueck.de) sind erlaubt.", true)
+    return
+  }
+
   if (password.value !== passwordConfirm.value) {
     showMessage("Die Passwörter stimmen nicht überein.", true)
     return
@@ -192,7 +210,6 @@ async function createAccount() {
     return
   }
 
-  // Automatische URL-Erkennung für den Bestätigungslink
   const redirectUrl = `${window.location.origin}/dashboard`
 
   const { error } = await supabase.auth.signUp({
