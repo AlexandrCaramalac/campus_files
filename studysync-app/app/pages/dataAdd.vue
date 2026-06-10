@@ -188,7 +188,6 @@ async function uploadFile() {
               </select>
             </div>
 
-            <!-- SEMESTER & JAHR (NEU) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
               <!-- Semester -->
               <div>

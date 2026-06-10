@@ -20,7 +20,7 @@ const faqs = [
   },
   {
     frage: 'Wofür ist StudySync?',
-    antwort: 'StudySync ist ein Ort, an dem Studierende Skripte, Mitschriften und Altklausuren teilen können. Je mehr wir unser Wissen miteinander teilen, ' +
+    antwort: 'StudySync ist ein Ort, an dem Studierende Skripte, Mitschriften und Probeklausuren teilen können. Je mehr wir unser Wissen miteinander teilen, ' +
         'desto einfacher wird das Lernen für alle.'
   },
   {

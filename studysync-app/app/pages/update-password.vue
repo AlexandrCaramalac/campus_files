@@ -63,7 +63,7 @@ const loading = ref(false)
 const isReady = ref(false)
 
 onMounted(() => {
-  // Erkennt Supabase automatisch den Reset-Token aus der URL und wechselt in den PASSWORD_RECOVERY Modus, wenn er gültig ist.
+  //  Auf Passwort-Reset-Modus warten
   supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
       isReady.value = true
@@ -86,7 +86,7 @@ async function updatePassword() {
 
   loading.value = true
   
-  // Versuchen password zu aktualisieren. Supabase wird automatisch den Reset-Token aus der URL verwenden.
+  // Passwort aktualisierenx
   const { error } = await supabase.auth.updateUser({
     password: newPassword.value
   })

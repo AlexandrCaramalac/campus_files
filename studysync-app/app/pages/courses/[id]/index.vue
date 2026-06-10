@@ -1,12 +1,11 @@
 <script setup>
-// --- LOGIK-BEREICH ---
 import { ref, computed } from 'vue'
 
-// 1. URL auslesen
+// Url auslesen
 const route = useRoute()
 const urlId = route.params.id
 
-// 2. Daten laden: Man fragt nun nur noch den spezifischen Kurs und dessen Zusatzdaten ab.
+// Daten laden
 const { data: course, refresh: refreshCourse } = await useFetch('/api/kurse/' + urlId)
 const { data: forums, refresh: refreshForums } = await useFetch('/api/kurse/foren/' + urlId)
 const { data: files, refresh: refreshFiles } = await useFetch('/api/dateien/' + urlId)
@@ -75,7 +74,6 @@ const loeschenBestaetigen = async () => {
 }
 
   const dateiLoeschen = (id) => {
-  console.log('dateiLoeschen aufgerufen mit id:', id)  // ← NEU
   zuLoeschendeDateiId.value = id
   zeigeLoeschDialogDatei.value = true
 }
@@ -99,7 +97,7 @@ const supabase = useSupabaseClient()
 const { data: { publicUrl } } = supabase.storage.from('kurs_dateien').getPublicUrl('')
 const publicUrlBase = publicUrl.endsWith('/') ? publicUrl : publicUrl + '/'
 
-// 3. Tab-Steuerung
+//Tab-Steuerung
 const aktiverTab = ref('Altklausuren')
 const tabs = ['Altklausuren', 'Karteikarten', 'Mitschriften', 'Alle Ressourcen']
 
@@ -136,8 +134,7 @@ const kursBewertungStarten = async () => {
     bewertungsFehler.value = 'Bewertung konnte nicht geprüft werden.'
   }
 }
-
-// Fehlermeldung erscheint, sobald jemand mehr als einmal bewerten möchte:
+// Prüfen, ob der Dozent bereits bewertet wurde
 const dozentBewertungStarten = async (dozentId) => {
   bewertungsFehler.value = ''
 
@@ -169,7 +166,7 @@ const dozentBewertungStarten = async (dozentId) => {
   }
 }
 
-// Wenn eine Bewertung gespeichert wurde, wird die Seite neu geladen
+// Kursdaten nach einer Bewertung aktualisieren
 const datenNeuLaden = async () => {
   // Diese Funktionen laden nur die Daten im Hintergrund neu
   await refreshCourse()
@@ -180,7 +177,7 @@ const datenNeuLaden = async () => {
   // der Website unangetastet.
 }
 
-// 4. Daten zusammenstellen
+//Daten zusammenstellen
 const modulDaten = computed(() => {
   const kursInfo = course.value?.kurs;
   const dozentenInfo = course.value?.dozenten;
@@ -208,7 +205,7 @@ const dozentenListe = computed(() => {
   return course.value?.dozenten?.map(item => item?.dozent).filter(Boolean) || []
 })
 
-// 5. Dateien aus der API aufbereiten
+// Dateien aus der API aufbereiten
 const formatDateityp = (dbTyp) => {
   if (dbTyp === 'altklausur') return 'Altklausuren'
   if (dbTyp === 'loesung') return 'Lösungen'
@@ -270,10 +267,10 @@ const toggleSortierung = () => {
 }
 
 const sortierteMaterialien = computed(() => {
-  // 1. Nach Tab filtern
+  //Nach Tab filtern
   let liste = materialien.value.filter(m => aktiverTab.value === 'Alle Ressourcen' || m.typ === aktiverTab.value);
 
-  // 2. Sortieren
+  // Sortieren
   return liste.sort((a, b) => {
     const getYearNumber = (jahrStr) => {
       if (!jahrStr) return 0;
@@ -451,7 +448,6 @@ const toggleAbo = async () => {
                     >
                       📥
                     </a>
-                    <!-- NEU: Löschen-Button -->
                     <button
                       v-if="user?.id === file.nutzerID"
                       @click="dateiLoeschen(file.id)"
