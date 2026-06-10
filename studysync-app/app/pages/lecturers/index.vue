@@ -39,8 +39,6 @@ const filteredDozenten = computed(() => {
 <template>
   <!--
     Dozentenübersicht:
-    Lightmode: heller Hintergrund
-    Darkmode: schwarzer Hintergrund
   -->
   <div
       class="min-h-[calc(100vh-260px)] bg-slate-50 dark:bg-black

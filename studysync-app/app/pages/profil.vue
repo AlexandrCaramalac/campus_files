@@ -29,6 +29,13 @@ const avatars = [
   "/avatars/schmetterling.png",
   "/avatars/tiger.png"
 ]
+const avatarTexte: Record<string, string> = {
+  "/avatars/affe.png": "Ole",
+  "/avatars/eule.png": "Alex",
+  "/avatars/nashorn.png": "Isabell",
+  "/avatars/schmetterling.png": "Merlin",
+  "/avatars/tiger.png": "Darian"
+}
 
 const saveAvatar = async () => {
   message.value = ""
@@ -194,7 +201,7 @@ const changePassword = async () => {
                 v-for="avatar in avatars"
                 :key="avatar"
                 @click="selectedAvatar = avatar"
-                class="rounded-[2rem] border p-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                class="relative group rounded-[2rem] border p-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                 :class="selectedAvatar === avatar
                 ? 'border-teal-400 ring-2 ring-teal-300 dark:ring-teal-500'
                 : 'border-slate-200 dark:border-gray-700'"
@@ -204,6 +211,22 @@ const changePassword = async () => {
                   alt="Profilbild"
                   class="w-full aspect-square object-cover rounded-[1.5rem]"
               />
+              <!--Easteregg Profilbilder:-->
+              <div
+                  class="absolute left-1/2 -translate-x-1/2 top-full mt-2
+                    opacity-0 group-hover:opacity-100
+                    pointer-events-none z-20
+                    bg-white/90 dark:bg-gray-800/90
+                    text-slate-600 dark:text-gray-300
+                    text-xs font-medium
+                    px-3 py-1.5 rounded-md
+                    shadow-sm border border-slate-200 dark:border-gray-700
+                    whitespace-nowrap
+                    transition-opacity duration-300"
+              >
+                {{ avatarTexte[avatar] }}
+              </div>
+
             </button>
           </div>
 

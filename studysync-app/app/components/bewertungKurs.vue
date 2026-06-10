@@ -34,7 +34,7 @@ const speichern = async () => {
       .from('bewertung_kurs')
       .insert({
         kursID: props.kursId,
-        nutzerID: user.value.sub, 
+        nutzerID: user.value.sub,
         aufwand: aufwand.value,
         nutzen: nutzen.value,
         schwierigkeit: schwierigkeit.value,
@@ -46,7 +46,7 @@ const speichern = async () => {
 
   if (error) {
     console.error("Fehler von Supabase:", error)
-    
+
     //Prüfung auf doppelten Eintrag
     if (error.code === '23505') {
       alert("Du hast diesen Kurs bereits bewertet!")
