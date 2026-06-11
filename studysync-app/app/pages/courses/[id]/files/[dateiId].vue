@@ -1,4 +1,6 @@
 <script setup>
+import sanitizeHtml from "sanitize-html"
+  
 const route = useRoute()
 const kursId = route.params.id
 const dateiId = route.params.dateiId
@@ -53,20 +55,54 @@ const loeschenBestaetigen = async () => {
   }
 }
 
+const bannedWords = ["idiot", "arsch", "fuck"]
+
+function normalize(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-zA-Zäöüß0-9 ]/g, "")
+}
+
+function containsBadWord(text) {
+  const normalized = normalize(text)
+  return bannedWords.some(word => normalized.includes(word))
+}
+
 const kommentarAbsenden = async () => {
   if (!neuerKommentar.value.trim()) return
+
   sendet.value = true
   fehler.value = ''
 
   try {
+    // 1) HTML entfernen 
+    const cleanKommentar = sanitizeHtml(neuerKommentar.value.trim(), {
+      allowedTags: [],
+      allowedAttributes: {}
+    })
+
+    // 2) Schimpfwörter prüfen
+    if (containsBadWord(cleanKommentar)) {
+	throw createError({ statusCode: 400, statusMessage: "Unangemessener Kommentar" });
+    }
+
+    // 3) absenden
     await $fetch('/api/datei/kommentare', {
       method: 'POST',
-      body: { dateiID: Number(dateiId), kommentar: neuerKommentar.value.trim() }
+      body: {
+        dateiID: Number(dateiId),
+        kommentar: cleanKommentar
+      }
     })
+
     neuerKommentar.value = ''
     await refreshKommentare()
+
   } catch (err) {
-    fehler.value = err?.data?.message || err?.message || 'Kommentar konnte nicht gespeichert werden.'
+    fehler.value =
+      err?.data?.message ||
+      err?.message ||
+      'Kommentar konnte nicht gespeichert werden.'
   } finally {
     sendet.value = false
   }
