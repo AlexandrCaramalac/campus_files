@@ -26,7 +26,7 @@
           </li>
           <li>
             <NuxtLink to="/lecturers" class="group flex items-center font-bold text-slate-600 dark:text-gray-300">
-              <span class="group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-teal-500 group-hover:to-blue-600 dark:group-hover:from-teal-400 dark:group-hover:to-blue-400 transition-all duration-300">Dozenten</span>
+              <span class="group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-teal-500 group-hover:to-blue-600 dark:group-hover:from-teal-400 dark:group-hover:to-blue-400 transition-all duration-300">Dozierende</span>
               <span class="w-0 opacity-0 overflow-hidden group-hover:w-4 group-hover:opacity-100 group-hover:ml-1 text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-600 transition-all duration-300 ease-out font-black">&rarr;</span>
             </NuxtLink>
           </li>
@@ -85,7 +85,7 @@
           <NuxtLink :to="startseiteLink" @click="isMobileMenuOpen = false" class="text-lg font-bold text-slate-700 dark:text-gray-200">Startseite</NuxtLink>
           <NuxtLink to="/guide" @click="isMobileMenuOpen = false" class="text-lg font-bold text-slate-700 dark:text-gray-200">Anleitung</NuxtLink>
           <NuxtLink to="/courses" @click="isMobileMenuOpen = false" class="text-lg font-bold text-slate-700 dark:text-gray-200">Kurse</NuxtLink>
-          <NuxtLink to="/lecturers" @click="isMobileMenuOpen = false" class="text-lg font-bold text-slate-700 dark:text-gray-200">Dozenten</NuxtLink>
+          <NuxtLink to="/lecturers" @click="isMobileMenuOpen = false" class="text-lg font-bold text-slate-700 dark:text-gray-200">Dozierende</NuxtLink>
         </div>
         
         <!-- Handy Buttons -->

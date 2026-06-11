@@ -95,7 +95,7 @@ const quelleConfig: Record<string, { label: string }> = {
   forum:           { label: "Forum" },
   kommentar_datei: { label: "Kommentar zu Datei" },
   kommentar_kurs:  { label: "Antwort in Forum" },
-  unterrichtet:    { label: "Dozent" },
+  unterrichtet:    { label: "Dozierende" },
 }
 
 const kursName = (kursId: any) =>

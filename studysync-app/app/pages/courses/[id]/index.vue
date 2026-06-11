@@ -109,7 +109,7 @@ const zeigeDozentBewertung = ref(false)
 const zuBewertendenDozentId = ref(null)
 const bewertungsFehler = ref('')
 
-// Die ID des aktuellen Dozenten sicher auslesen
+// Die ID der aktuellen Lehrperson sicher auslesen
 const aktuelleDozentId = computed(() => {
   return course.value?.dozenten?.[0]?.dozent?.id || null
 })
@@ -136,8 +136,7 @@ const kursBewertungStarten = async () => {
     bewertungsFehler.value = 'Bewertung konnte nicht geprüft werden.'
   }
 }
-
-// Fehlermeldung erscheint, sobald jemand mehr als einmal bewerten möchte:
+// Prüfen, ob die Lehrperson bereits bewertet wurde
 const dozentBewertungStarten = async (dozentId) => {
   bewertungsFehler.value = ''
 
@@ -147,7 +146,7 @@ const dozentBewertungStarten = async (dozentId) => {
   }
 
   if (!dozentId) {
-    bewertungsFehler.value = 'Zu diesem Kurs ist kein Dozent hinterlegt.'
+    bewertungsFehler.value = 'Zu diesem Kurs ist keine Lehrperson hinterlegt.'
     return
   }
 
@@ -157,7 +156,7 @@ const dozentBewertungStarten = async (dozentId) => {
     )
 
     if (alreadyRated) {
-      bewertungsFehler.value = 'Du hast diesen Dozenten bereits bewertet.'
+      bewertungsFehler.value = 'Du hast diese Lehrperson bereits bewertet.'
       return
     }
 
@@ -188,7 +187,7 @@ const modulDaten = computed(() => {
 
   const hauptDozent = dozentenInfo && dozentenInfo.length > 0
       ? `${dozentenInfo[0].dozent.vorname} ${dozentenInfo[0].dozent.nachname}`
-      : 'Kein Dozent zugewiesen';
+      : 'Keine Lehrperson zugewiesen';
 
   const dozentBewertung = dozentenInfo && dozentenInfo.length > 0
       ? dozentenInfo[0].dozent.gesamtbewertung || 'Keine Bewertung'
@@ -469,7 +468,7 @@ const toggleAbo = async () => {
             </div>
           </section>
 
-          <!-- Bereich: Dozent, Kurs Info & Bewertungen -->
+          <!-- Bereich: Dozierende, Kurs Info & Bewertungen -->
           <!-- Bereich: Bewertungen & Kurs-ID -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
@@ -550,7 +549,7 @@ const toggleAbo = async () => {
                 Zu diesem Kurs sind derzeit keine Lehrenden hinterlegt.
               </div>
 
-              <!-- Dozenten-Karte -->
+              <!-- Dozierenden-Karte -->
               <div
                 v-for="dozent in dozentenListe"
                 :key="dozent.id"

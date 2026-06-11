@@ -13,7 +13,7 @@ const emit = defineEmits(['gespeichert', 'abbrechen'])
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-// Kriterien für Dozenten
+// Kriterien für Dozierende
 const verstaendlichkeit = ref(3)
 const struktur = ref(3)
 const engagement = ref(3)
@@ -44,12 +44,12 @@ const speichern = async () => {
 
   isLoading.value = false
 
-  if (error) {
+    if (error) {
     console.error("Fehler von Supabase:", error)
     
     //Prüfung auf doppelten Eintrag
     if (error.code === '23505') {
-      alert("Du hast diesen Dozenten bereits bewertet!")
+      alert("Du hast diese Lehrperson bereits bewertet!")
     } else {
       alert("Fehler beim Speichern.")
     }
@@ -68,44 +68,44 @@ const speichern = async () => {
            max-w-md w-full
            transition-colors duration-300"
   >
-    <h3 class="font-black text-2xl text-slate-800 dark:text-gray-100 mb-6">Dozent bewerten</h3>
+    <h3 class="font-black text-2xl text-slate-800 dark:text-gray-100 mb-6">Dozierende(n) bewerten</h3>
 
     <div class="space-y-6">
 
-      <!-- Verständlichkeit -->
+      <!-- Verständlichkeit -> Die/Der Dozierende drückt sich klar und verständlich aus -->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">
-          <span>Verständlichkeit</span>
+          <span>Die/Der Dozierende drückt sich klar und verständlich aus.</span>
           <span class="text-green-600 dark:text-green-400">{{ verstaendlichkeit}}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="verstaendlichkeit"
                class="w-full h-4 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-600 dark:accent-green-500">
       </div>
 
-      <!-- Struktur -->
+      <!-- Struktur -> Die/Der Dozierende hat eine klare Struktur und nutzt die Zeit für das Wesentliche -->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">
-          <span>Struktur</span>
+          <span>Die/Der Dozierende hat eine klare Struktur und nutzt die Zeit für das Wesentliche.</span>
           <span class="text-green-600 dark:text-green-400">{{ struktur}}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="struktur"
                class="w-full h-4 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-600 dark:accent-green-500">
       </div>
 
-      <!-- Engagement -->
+      <!-- Engagement -> Der/Dem Dozierende scheint der Lernerfolg der Studierenden wichtig zu sein-->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">
-          <span>Engagement</span>
+          <span>Der/Dem Dozierenden scheint der Lernerfolg der Studierenden wichtig zu sein.</span>
           <span class="text-green-600 dark:text-green-400">{{ engagement }}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="engagement"
                class="w-full h-4 bg-slate-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-green-600 dark:accent-green-500">
       </div>
 
-      <!-- Freundlichkeit -->
+      <!-- Freundlichkeit -> Die/Der Dozierende verhält sich den Studierenden gegenüber freundlich und respektvoll-->
       <div>
         <label class="flex justify-between text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">
-          <span>Freundlichkeit</span>
+          <span>Die/Der Dozierende verhält sich den Studierenden gegenüber freundlich und respektvoll.</span>
           <span class="text-green-600 dark:text-green-400">{{ freundlichkeit }}</span>
         </label>
         <input type="range" min="1" max="5" step="1" v-model.number="freundlichkeit"

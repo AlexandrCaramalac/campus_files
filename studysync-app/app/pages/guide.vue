@@ -29,12 +29,29 @@ const faqs = [
         '50 MB möglich.'
   },
   {
+    frage: 'Wie kann ich Dateien herunterladen?',
+    antwort: 'Wenn zu einem Kurs Dateien vorhanden sind, kannst du diese in der Kursübersicht oder auf der jeweiligen Kursseite ansehen und herunterladen.'
+  },
+  {
+    frage: 'Wofür ist das Forum gedacht?',
+    antwort: 'Im Forum können Fragen zu Kursen, Lernmaterialien oder organisatorischen Themen gestellt und beantwortet werden. Es soll den Austausch zwischen Studierenden erleichtern.'
+  },
+  {
     frage: 'Wie funktionieren die Bewertungen?',
-    antwort: 'In der jeweiligen Modulübersicht findest du die Gesamtbewertung eines Kurses sowie des zugehörigen Dozenten. Dozenten können zusätzlich über den Menüpunkt' +
-        ' "Dozenten" gesucht und dort anhand eines Sternesystems bewertet werden. Ein Stern steht für die niedrigste, fünf Sterne für die höchste Bewertung. Dabei wird ' +
-        'bewusst zwischen Modulen und Dozenten unterschieden, da sich Dozenten im Laufe der Zeit ändern können. Einzelne Bewertungen spiegeln stets subjektive Eindrücke ' +
-        'wider, während die Gesamtbewertung einen aktuellen Überblick über die Qualität eines Kurses oder eines Dozenten geben soll.'
-  }
+    antwort: 'In der jeweiligen Kursübersicht findest du die Gesamtbewertung eines Kurses sowie des zugehörigen Dozierenden. Dozierende können zusätzlich über den Menüpunkt' +
+        ' "Dozierende" gesucht und dort anhand eines Sternesystems bewertet werden. Ein Stern steht für die niedrigste, fünf Sterne für die höchste Bewertung. Dabei wird ' +
+        'bewusst zwischen Kursen und Dozierenden unterschieden, da sich Dozierende im Laufe der Zeit ändern können. Einzelne Bewertungen spiegeln stets subjektive Eindrücke ' +
+        'wider, während die Gesamtbewertung einen aktuellen Überblick über die Qualität eines Kurses oder eines Dozierenden geben soll.'
+  },
+  {
+    frage: 'Warum gibt es getrennte Bewertungen für Kurse und Dozierende?',
+    antwort: 'Kurse und Dozierende werden getrennt bewertet, weil ein Kurs über mehrere Semester bestehen kann, während sich die lehrende Person ändern kann. So bleiben die Bewertungen übersichtlicher und aussagekräftiger.'
+  },
+  {
+    frage: 'Sind Bewertungen anonym?',
+    antwort: 'Bewertungen einzelner Nutzender sind nur für Admins sichtbar. Anderen Nutzenden werden ausschließlich anonyme Durchschnittswerte angezeigt.'
+  },
+
 ]
 
 /*

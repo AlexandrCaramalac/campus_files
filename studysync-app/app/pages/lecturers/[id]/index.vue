@@ -74,13 +74,13 @@ const dozentBewertungStarten = async () => {
     const { alreadyRated } = await $fetch(`/api/dozenten/bewertung/check?dozentID=${route.params.id}`)
 
     if (alreadyRated) {
-      bewertungsFehler.value = 'Du hast diesen Dozenten bereits bewertet.'
+      bewertungsFehler.value = 'Du hast diese Lehrperson bereits bewertet.'
       return
     }
 
     zeigeDozentBewertung.value = true
   } catch (error) {
-    console.error('Fehler beim Prüfen der Dozentenbewertung:', error)
+    console.error('Fehler beim Prüfen der Dozierendenbewertung:', error)
     bewertungsFehler.value = 'Bewertung konnte nicht geprüft werden.'
   }
 }
@@ -134,7 +134,7 @@ const truncateText = (text, maxLength = 200) => {
       <!-- Zurück-Link -->
       <div class="mb-6 pl-2">
         <NuxtLink to="/lecturers" class="inline-flex items-center text-green-600 dark:text-green-400 hover:text-blue-700 dark:hover:text-blue-400 font-bold transition-colors">
-          <span class="mr-2 text-2xl leading-none">&larr;</span> Zurück zur Dozentenübersicht
+          <span class="mr-2 text-2xl leading-none">&larr;</span> Zurück zur Dozierendenübersicht
         </NuxtLink>
       </div>
 
@@ -147,7 +147,7 @@ const truncateText = (text, maxLength = 200) => {
         </h1>
 
         <p class="mt-4 text-lg text-green-50 dark:text-gray-200 max-w-3xl relative z-10 font-medium leading-relaxed">
-          Bewertungsübersicht & Informationen zum Dozenten
+          Bewertungsübersicht & Informationen zur/zum Dozierenden
         </p>
       </header>
 
@@ -166,7 +166,7 @@ const truncateText = (text, maxLength = 200) => {
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-slate-50 dark:bg-gray-800 p-5 rounded-2xl transition-colors duration-300">
-                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Verständlichkeit</p>
+                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Die/Der Dozierende drückt sich klar und verständlich aus.</p>
                   <div class="text-amber-400 text-lg my-1">
                     {{ generiereSterne(lecturer?.bewertungen?.verstaendlichkeit) }}
                   </div>
@@ -176,7 +176,7 @@ const truncateText = (text, maxLength = 200) => {
                 </div>
 
                 <div class="bg-slate-50 dark:bg-gray-800 p-5 rounded-2xl transition-colors duration-300">
-                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Struktur</p>
+                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Die/Der Dozierende hat eine klare Struktur und nutzt die Zeit für das Wesentliche.</p>
                   <div class="text-amber-400 text-lg my-1">
                     {{ generiereSterne(lecturer?.bewertungen?.struktur) }}
                   </div>
@@ -186,7 +186,7 @@ const truncateText = (text, maxLength = 200) => {
                 </div>
 
                 <div class="bg-slate-50 dark:bg-gray-800 p-5 rounded-2xl transition-colors duration-300">
-                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Engagement</p>
+                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Der/Dem Dozierenden scheint der Lernerfolg der Studierenden wichtig zu sein.</p>
                   <div class="text-amber-400 text-lg my-1">
                     {{ generiereSterne(lecturer?.bewertungen?.engagement) }}
                   </div>
@@ -196,7 +196,7 @@ const truncateText = (text, maxLength = 200) => {
                 </div>
 
                 <div class="bg-slate-50 dark:bg-gray-800 p-5 rounded-2xl transition-colors duration-300">
-                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Freundlichkeit</p>
+                  <p class="text-sm text-slate-400 dark:text-gray-500 font-bold">Die/Der Dozierende verhält sich den Studierenden gegenüber freundlich und respektvoll.</p>
                   <div class="text-amber-400 text-lg my-1">
                     {{ generiereSterne(lecturer?.bewertungen?.freundlichkeit) }}
                   </div>
@@ -219,7 +219,7 @@ const truncateText = (text, maxLength = 200) => {
                 <button 
                   @click="dozentBewertungStarten()" 
                   class="w-full max-w-sm bg-slate-50 dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-gray-700 text-slate-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 font-bold py-3 rounded-xl transition-colors border border-slate-250 dark:border-gray-700">
-                  Dozent bewerten
+                  Dozierende(n) bewerten
                 </button>
               </div>
 

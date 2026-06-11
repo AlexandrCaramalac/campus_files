@@ -4,12 +4,12 @@ import { ref, computed } from "vue"
 const { data } = await useFetch("/api/dozenten")
 
 /*
-  Suchtext für die Dozenten-Suche
+  Suchtext für die Dozierenden-Suche
 */
 const search = ref("")
 
 /*
-  Gefilterte und sortierte Dozenten:
+  Gefilterte und sortierte Dozierende:
   1. Alphabetisch nach Nachname sortieren
   2. Nach Suchtext filtern (Vor- oder Nachname)
 */
@@ -38,9 +38,7 @@ const filteredDozenten = computed(() => {
 
 <template>
   <!--
-    Dozentenübersicht:
-    Lightmode: heller Hintergrund
-    Darkmode: schwarzer Hintergrund
+    Dozierendenübersicht:
   -->
   <div
       class="min-h-[calc(100vh-260px)] bg-slate-50 dark:bg-black
@@ -56,14 +54,14 @@ const filteredDozenten = computed(() => {
                text-slate-800 dark:text-gray-100
                mb-8 ml-2"
       >
-        Alle Dozenten
+        Alle Dozierenden
       </h1>
 
       <!-- Suchleiste -->
       <input
           v-model="search"
           type="text"
-          placeholder="Dozenten suchen..."
+          placeholder="Dozierende suchen..."
           class="w-full mb-6 px-6 py-4 rounded-2xl
                border border-slate-200 dark:border-gray-700
                bg-white dark:bg-gray-900
@@ -74,15 +72,15 @@ const filteredDozenten = computed(() => {
                transition-colors duration-300"
       />
 
-      <!-- Dozentenliste scrollbar machen, damit Footer sichtbar ist -->
+      <!-- Dozierendenliste scrollbar machen, damit Footer sichtbar ist -->
       <ul class="max-h-[70vh] overflow-y-auto pr-2 pt-2 pb-2 space-y-4">
         
-        <!-- Hinweis, wenn keine Dozenten gefunden wurden -->
+        <!-- Hinweis, wenn keine Dozierenden gefunden wurden -->
         <div 
           v-if="filteredDozenten.length === 0" 
           class="p-8 text-center text-slate-400 dark:text-gray-500 font-medium bg-slate-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-slate-200 dark:border-gray-700"
         >
-          Keine Dozenten gefunden.
+          Keine Dozierenden gefunden.
         </div>
 
         <li
@@ -100,7 +98,7 @@ const filteredDozenten = computed(() => {
               :to="`/lecturers/${nutzer.id}`"
               class="flex items-center justify-between p-4 w-full cursor-pointer"
           >
-            <!-- Dozentenname -->
+            <!-- Dozierendenname -->
             <h2
                 class="text-xl md:text-2xl font-bold
                      text-slate-700 dark:text-gray-100

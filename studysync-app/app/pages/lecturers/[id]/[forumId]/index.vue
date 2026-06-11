@@ -70,7 +70,7 @@ const kommentarAbsenden = async () => {
           :to="`/lecturers/${dozentId}`"
           class="inline-flex items-center text-green-600 dark:text-green-400 hover:text-blue-700 dark:hover:text-blue-400 font-bold transition-colors"
         >
-          <span class="mr-2 text-2xl leading-none">&larr;</span> Zurück zum Dozenten
+          <span class="mr-2 text-2xl leading-none">&larr;</span> Zurück zur Dozierenden-Ansicht
         </NuxtLink>
       </div>
 

@@ -41,7 +41,7 @@ const goToLogin = () => {
     -->
     <img src="/icon1.png" class="floating top-left" title="Teile Lernmaterialien mit anderen Studierenden!" />
     <img src="/icon7.png" class="floating top-right" title="Finde die besten Zusammenfassungen!" />
-    <img src="/icon3.png" class="floating left" title="Bewerte Kurse und Dozenten!" />
+    <img src="/icon3.png" class="floating left" title="Bewerte Kurse und Dozierende!" />
     <img src="/icon2.png" class="floating right" title="Diskutiere im Forum!" />
     <img src="/icon5.png" class="floating bottom-left" title="Lerne effizienter mit StudySync!" />
     <img src="/icon6.png" class="floating bottom-right" title="Wusstest du, dass der Master Nils Burger nach dem Erfinder der SWOSY App benannt ist?" />
