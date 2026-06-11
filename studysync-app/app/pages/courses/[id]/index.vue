@@ -100,8 +100,8 @@ const { data: { publicUrl } } = supabase.storage.from('kurs_dateien').getPublicU
 const publicUrlBase = publicUrl.endsWith('/') ? publicUrl : publicUrl + '/'
 
 // 3. Tab-Steuerung
-const aktiverTab = ref('Altklausuren')
-const tabs = ['Altklausuren', 'Karteikarten', 'Mitschriften', 'Alle Ressourcen']
+const aktiverTab = ref('Probeklausuren')
+const tabs = ['Probeklausuren', 'Karteikarten', 'Mitschriften', 'Alle Ressourcen']
 
 // Steuerung für die Bewertungs-Popups
 const zeigeKursBewertung = ref(false)
@@ -209,7 +209,7 @@ const dozentenListe = computed(() => {
 
 // 5. Dateien aus der API aufbereiten
 const formatDateityp = (dbTyp) => {
-  if (dbTyp === 'altklausur') return 'Altklausuren'
+  if (dbTyp === 'altklausur') return 'Probeklausuren'
   if (dbTyp === 'loesung') return 'Lösungen'
   if (dbTyp === 'mitschrift') return 'Mitschriften'
   return dbTyp
