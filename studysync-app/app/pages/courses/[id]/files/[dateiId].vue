@@ -18,7 +18,7 @@ const downloadUrl = computed(() => datei.value ? `${publicUrlBase}${datei.value.
 const kommentare = computed(() => kommentarData.value?.kommentare ?? [])
 
 const formatDateityp = (dbTyp) => {
-  if (dbTyp === 'altklausur') return 'Altklausur'
+  if (dbTyp === 'altklausur') return 'Probeklausur'
   if (dbTyp === 'loesung') return 'Lösung'
   if (dbTyp === 'mitschrift') return 'Mitschrift'
   return dbTyp

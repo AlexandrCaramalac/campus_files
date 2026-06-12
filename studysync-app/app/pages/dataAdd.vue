@@ -169,7 +169,7 @@ async function uploadFile() {
                     value="altklausur"
                     class="bg-white dark:bg-gray-800 text-slate-800 dark:text-gray-100"
                 >
-                  Altklausuren
+                  Probeklausuren
                 </option>
 
                 <option

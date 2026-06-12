@@ -1,11 +1,13 @@
 /**
- * Deletes a file for the logged-in user
+ * deletes a file from both the database table and the bucket if the file belongs to the given user
  */
-import { serverSupabaseClient } from "#supabase/server"
+import { serverSupabaseClient, serverSupabaseServiceRole } from "#supabase/server"
 import { getRouterParam } from "h3"
 
 export default eventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
+  const serviceClient = serverSupabaseServiceRole(event);
+  
   const user = (await client.auth.getUser()).data.user as any;
   const userId = user?.id ?? user?.sub;
 
@@ -19,16 +21,28 @@ export default eventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Fehlende ID" });
   }
 
-  const { error } = await (client.from("dateien") as any)
-    .delete()
+  // normal client for table
+  const { data: datei, error: fetchError } = await (client.from("dateien") as any)
+    .select("dateipfad")
     .eq("id", id)
-    .eq("nutzerID", userId);
+    .eq("nutzerID", userId)
+    .single();
 
-  if (error) {
-    console.error("Datei DELETE Error:", error);
+
+  // when trying to delete a file that does not belong to the user: throw error and do not continue
+  if (fetchError || !datei) {
+    throw createError({ statusCode: 404, statusMessage: "Datei nicht gefunden" });
+  }
+
+  // secret client for storage
+  const { error: storageError } = await serviceClient.storage
+    .from("kurs_dateien")
+    .remove([datei.dateipfad]);
+
+  if (storageError) {
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || "Datei konnte nicht gelöscht werden"
+      statusMessage: storageError.message || "Datei konnte nicht gelöscht werden"
     });
   }
 
