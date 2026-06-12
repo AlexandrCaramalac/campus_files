@@ -62,22 +62,40 @@
 
         <div>
           <label class="block text-sm font-bold text-slate-600 dark:text-gray-400 mb-1">Passwort</label>
-          <input
-              type="password"
-              v-model="password"
-              placeholder="••••••••"
-              class="w-full px-4 py-3 border border-slate-200 dark:border-gray-700 rounded-xl bg-slate-50 dark:bg-gray-800 text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-colors"
-          />
+          <div class="relative">
+            <input
+                :type="showPassword ? 'text' : 'password'"
+                v-model="password"
+                placeholder="••••••••"
+                class="w-full pr-24 px-4 py-3 border border-slate-200 dark:border-gray-700 rounded-xl bg-slate-50 dark:bg-gray-800 text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-colors"
+            />
+            <button
+              type="button"
+              @click="showPassword = !showPassword"
+              class="absolute inset-y-0 right-3 flex items-center rounded-lg px-3 text-xs font-bold text-slate-500 dark:text-gray-300 hover:text-teal-600 transition-colors"
+            >
+              {{ showPassword ? 'Ausblenden' : 'Anzeigen' }}
+            </button>
+          </div>
         </div>
 
         <div v-if="mode === 'register'">
           <label class="block text-sm font-bold text-slate-600 dark:text-gray-400 mb-1">Passwort wiederholen</label>
-          <input
-              type="password"
-              v-model="passwordConfirm"
-              placeholder="••••••••"
-              class="w-full px-4 py-3 border border-slate-200 dark:border-gray-700 rounded-xl bg-slate-50 dark:bg-gray-800 text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-colors"
-          />
+          <div class="relative">
+            <input
+                :type="showPasswordConfirm ? 'text' : 'password'"
+                v-model="passwordConfirm"
+                placeholder="••••••••"
+                class="w-full pr-24 px-4 py-3 border border-slate-200 dark:border-gray-700 rounded-xl bg-slate-50 dark:bg-gray-800 text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-colors"
+            />
+            <button
+              type="button"
+              @click="showPasswordConfirm = !showPasswordConfirm"
+              class="absolute inset-y-0 right-3 flex items-center rounded-lg px-3 text-xs font-bold text-slate-500 dark:text-gray-300 hover:text-teal-600 transition-colors"
+            >
+              {{ showPasswordConfirm ? 'Ausblenden' : 'Anzeigen' }}
+            </button>
+          </div>
         </div>
 
         <!-- Passwort vergessen Button -->
@@ -94,7 +112,7 @@
           v-if="message" 
           :class="[
             'p-3 rounded-xl font-bold text-center text-sm transition-all mt-4',
-            isError ? 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' : 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
+            isError ? 'bg-red-100 text-red-700 border border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' : 'bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
           ]"
         >
           {{ message }}
@@ -120,7 +138,9 @@ const supabase = useSupabaseClient()
 const mode = ref("login")
 const email = ref("")
 const password = ref("")
-const passwordConfirm = ref("") 
+const passwordConfirm = ref("")
+const showPassword = ref(false)
+const showPasswordConfirm = ref(false)
 const firstName = ref("")
 const message = ref("")
 const isError = ref(false)
