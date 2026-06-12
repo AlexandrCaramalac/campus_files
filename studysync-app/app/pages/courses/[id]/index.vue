@@ -34,6 +34,17 @@ const loeschtDateiId = ref(null)
 const loeschDateiFehler = ref('')
 const zeigeLoeschDialogDatei = ref(false)
 const zuLoeschendeDateiId = ref(null)
+const forumSuche = ref('')
+const gefilterteForen = computed(() => {
+  const beitraege = forums.value?.beitraege || []
+  const suche = forumSuche.value.trim().toLowerCase()
+  if (!suche) return beitraege
+  return beitraege.filter(item => {
+    const thema = item.thema?.toLowerCase() || ''
+    const autor = item.profile?.name?.toLowerCase() || ''
+    return thema.includes(suche) || autor.includes(suche)
+  })
+})
 
 const diskussionPosten = async () => {
   if (!neuesDiskussionsThema.value.trim()) return
@@ -590,20 +601,36 @@ const toggleAbo = async () => {
         <!-- Rechte Spalte (Diskussionen) -->
         <aside class="bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl shadow-green-900/5 dark:shadow-black/40 border border-slate-100 dark:border-gray-700 flex flex-col h-fit overflow-hidden transition-colors duration-300">
 
-          <div class="p-6 bg-slate-50 dark:bg-gray-800 border-b border-slate-100 dark:border-gray-700 text-center transition-colors duration-300">
+          <div class="px-6 pt-6 pb-4 bg-slate-50 dark:bg-gray-800 text-center transition-colors duration-300">
             <h2 class="font-extrabold text-slate-700 dark:text-gray-100 uppercase tracking-widest text-sm">Diskussionen</h2>
+          </div>
+
+          <div class="px-6 pt-2 pb-6 bg-slate-50 dark:bg-gray-800">
+            <label class="sr-only" for="forum-search">Forum durchsuchen</label>
+            <div class="relative">
+              <input
+                id="forum-search"
+                v-model="forumSuche"
+                type="search"
+                placeholder="Forum durchsuchen"
+                class="w-full rounded-2xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-slate-800 dark:text-gray-100 placeholder:text-slate-400 dark:placeholder:text-gray-500 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors"
+              />
+            </div>
+            <p v-if="forumSuche && gefilterteForen.length === 0" class="mt-2 text-xs text-slate-500 dark:text-gray-400 break-words leading-tight">
+              Keine Beiträge für „{{ forumSuche }}“ gefunden.
+            </p>
           </div>
 
           <!-- Beitragsliste -->
           <div class="p-6 space-y-4 max-h-72 overflow-y-auto">
-            <div v-if="!forums?.beitraege?.length" class="text-center py-4 text-slate-400 dark:text-gray-500 text-sm">
-              Noch keine Diskussionen.
+            <div v-if="gefilterteForen.length === 0" class="text-center py-4 text-slate-400 dark:text-gray-500 text-sm">
+              {{ forumSuche ? 'Keine Diskussionen gefunden.' : 'Noch keine Diskussionen.' }}
             </div>
 
             <p v-if="loeschFehler" class="text-red-500 text-xs font-medium">{{ loeschFehler }}</p>
 
             <div
-              v-for="(item, index) in forums?.beitraege"
+              v-for="(item, index) in gefilterteForen"
               :key="item.id"
               :class="[index > 0 ? 'border-t border-slate-100 dark:border-gray-700 pt-4' : '']"
             >
