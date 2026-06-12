@@ -51,3 +51,37 @@ onMounted(async () => {
   isLoading.value = false
 })
 </script>
+
+<style>
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill,
+input:-webkit-autofill:hover,
+textarea:-webkit-autofill:hover,
+select:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0f172a !important;
+  background-color: rgba(248, 250, 252, 1) !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(248, 250, 252, 1) inset !important;
+  box-shadow: 0 0 0px 1000px rgba(248, 250, 252, 1) inset !important;
+  transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s !important;
+}
+
+.dark input:-webkit-autofill,
+.dark textarea:-webkit-autofill,
+.dark select:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:hover,
+.dark select:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill:focus,
+.dark select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f8fafc !important;
+  background-color: rgba(31, 41, 55, 1) !important;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(31, 41, 55, 1) inset !important;
+  box-shadow: 0 0 0px 1000px rgba(31, 41, 55, 1) inset !important;
+  transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s !important;
+}
+</style>
