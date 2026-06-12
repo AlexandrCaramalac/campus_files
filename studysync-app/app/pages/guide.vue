@@ -20,8 +20,12 @@ const faqs = [
   },
   {
     frage: 'Wofür ist StudySync?',
-    antwort: 'StudySync ist ein Ort, an dem Studierende Skripte, Mitschriften und Altklausuren teilen können. Je mehr wir unser Wissen miteinander teilen, ' +
+    antwort: 'StudySync ist ein Ort, an dem Studierende Skripte, Mitschriften und Probeklausuren teilen können. Je mehr wir unser Wissen miteinander teilen, ' +
         'desto einfacher wird das Lernen für alle.'
+  },
+  {
+    frage: 'Muss ich angemeldet sein, um StudySync zu nutzen?',
+    antwort: 'Ja, die meisten Inhalte von StudySync sind erst nach dem Login zugänglich. Dadurch soll sichergestellt werden, dass die Plattform vor allem von Studierenden genutzt wird.'
   },
   {
     frage: 'Wer kann Dateien hochladen?',
@@ -65,12 +69,7 @@ function toggle(index) {
 </script>
 
 <template>
-  <!--
-    FAQ-Seite:
-    Lightmode: heller Hintergrund
-    Darkmode: schwarzer Hintergrund
-    Footer fixieren: min-h-[calc(100vh-260px)]
-  -->
+
   <div
       class="min-h-[calc(100vh-260px)] bg-slate-50 dark:bg-black
            font-sans text-slate-800 dark:text-gray-100

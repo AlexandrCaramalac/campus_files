@@ -126,7 +126,7 @@ const message = ref("")
 const isError = ref(false)
 
 
-const RESTRICT_EMAILS = false
+const RESTRICT_EMAILS = true
 
 const ALLOWED_DOMAINS = [
   "@uos.de",
@@ -164,6 +164,11 @@ async function resetPassword() {
     return
   }
 
+  if (!istErlaubteEmail(email.value)) {
+    showMessage("Nur Uni-E-Mail-Adressen (@uos.de oder @uni-osnabrueck.de) sind erlaubt.", true)
+    return
+  }
+
   const redirectUrl = `${window.location.origin}/update-password`
 
   const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
@@ -194,8 +199,7 @@ async function createAccount() {
     return
   }
 
-  // FRONTEND DOMAIN CHECK
-  if (RESTRICT_EMAILS && !istErlaubteEmail(email.value)) {
+  if (!istErlaubteEmail(email.value)) {
     showMessage("Nur Uni-E-Mail-Adressen (@uos.de oder @uni-osnabrueck.de) sind erlaubt.", true)
     return
   }
@@ -225,7 +229,7 @@ async function createAccount() {
     showMessage(error.message, true)
   }
   else {
-    showMessage("Account erstellt! Bitte E-Mail bestätigen.")
+    showMessage("Account erstellt! Wir haben dir einen Bestätigungslink geschickt! Bitte schaue auch in deinem Spam-Ordner nach.")
     password.value = ""
     passwordConfirm.value = ""
   }

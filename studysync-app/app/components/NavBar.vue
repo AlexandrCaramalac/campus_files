@@ -157,6 +157,6 @@ const logout = async () => {
 
 // Spenden Alert
 const spendenClick = () => {
-  alert('Vielen Dank für das Interesse! Die Möglichkeit zu spenden wird in naher Zukunft freigeschaltet.')
+  alert('Vielen Dank für das Interesse! Die Möglichkeit zu spenden wird in naher Zukunft freigeschaltet – und unser Merchandise-Shop kommt auch bald online, damit ihr euch bald richtig ausstatten könnt!')
 }
 </script>
