@@ -21,19 +21,43 @@ export default eventHandler(async (event) => {
   const jahrData = multipartData?.find(el => el.name === 'jahr');
   const semesterData = multipartData?.find(el => el.name === 'semester'); // NEU
   const kursIdData = multipartData?.find(el => el.name === 'kursID');
+  const dozentIdData = multipartData?.find(el => el.name === 'dozentID');
   const typData = multipartData?.find(el => el.name === 'typ');
   const fileData = multipartData?.find(el => el.name === 'file');
 
   // NEU: semesterData in die Prüfung aufgenommen
-  if (!kursIdData || !typData || !jahrData || !semesterData || !fileData || !fileData.filename) {
+  if (!kursIdData || !dozentIdData || !typData || !jahrData || !semesterData || !fileData || !fileData.filename) {
     throw createError({ 
       statusCode: 400, 
-      statusMessage: 'Fehlende Daten: kursID, typ, jahr, semester oder Datei nicht gefunden.' 
+      statusMessage: 'Bitte wähle Kurs und Lehrperson aus und gib Typ, Jahr, Semester sowie eine Datei an.'
     });
   } 
 
-  const kursID = kursIdData.data.toString();
+  const kursID = Number(kursIdData.data.toString());
+  const dozentID = Number(dozentIdData.data.toString());
+  if (!Number.isInteger(kursID) || kursID <= 0 || !Number.isInteger(dozentID) || dozentID <= 0) {
+    throw createError({ statusCode: 400, statusMessage: 'Kurs oder Lehrperson ist ungültig.' });
+  }
+
+  const { data: unterrichtet, error: assignmentError } = await client
+    .from('unterrichtet')
+    .select('kursID')
+    .eq('kursID', kursID)
+    .eq('dozentID', dozentID)
+    .maybeSingle();
+
+  if (assignmentError) {
+    console.error('Supabase assignment check error:', assignmentError);
+    throw createError({ statusCode: 500, statusMessage: 'Die Kurs-Lehrperson-Zuordnung konnte nicht geprüft werden.' });
+  }
+  if (!unterrichtet) {
+    throw createError({ statusCode: 400, statusMessage: 'Diese Lehrperson unterrichtet den ausgewählten Kurs nicht.' });
+  }
+
   const typ = typData.data.toString();
+  if (!['skript', 'uebungsaufgabe', 'mitschrift', 'altklausur'].includes(typ)) {
+    throw createError({ statusCode: 400, statusMessage: 'Der Dateityp muss Skript, Übungsaufgabe, Mitschrift oder Altklausur sein.' });
+  }
   const dateiname = fileData.filename;
 
   const ext = fileData.filename?.split('.').pop();
@@ -63,6 +87,7 @@ export default eventHandler(async (event) => {
   .insert({
     typ: typ,
     kursID: kursID,
+    dozentID: dozentID,
     nutzerID: user.id,
     dateipfad: dateipfad,
     dateiname: dateiname,

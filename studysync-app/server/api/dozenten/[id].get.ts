@@ -54,7 +54,10 @@ export default eventHandler(async (event) => {
     if (!kurs) return null;
     const { data: bewertung } = await client
     // @ts-ignore
-      .rpc("get_kurs_ratings", { p_kurs_id: kurs.id }).single();
+      .rpc("get_kurs_ratings", {
+        p_kurs_id: kurs.id,
+        p_dozent_id: Number(dozentId),
+      }).single();
     return {
       ...kurs, 
       // @ts-ignore

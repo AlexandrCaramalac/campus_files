@@ -106,7 +106,9 @@ const kursBewertungStarten = async (kursId) => {
   }
 
   try {
-    const { alreadyRated } = await $fetch(`/api/kurse/bewertung/check?kursID=${kursId}`)
+    const { alreadyRated } = await $fetch(
+      `/api/kurse/bewertung/check?kursID=${kursId}&dozentID=${route.params.id}`
+    )
 
     if (alreadyRated) {
       bewertungsFehler.value = 'Du hast diesen Kurs bereits bewertet.'
@@ -435,6 +437,7 @@ const truncateText = (text, maxLength = 200) => {
   <div v-if="zeigeKursBewertung" class="fixed inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <BewertungKurs
       :kursId="zuBewertendenKursId"
+      :dozenten="lecturer?.dozent ? [lecturer.dozent] : []"
       @abbrechen="zeigeKursBewertung = false; bewertungsFehler = ''"
       @gespeichert="zeigeKursBewertung = false; bewertungsFehler = ''; datenNeuLaden()"
     />

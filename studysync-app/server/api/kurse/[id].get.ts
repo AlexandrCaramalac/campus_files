@@ -6,6 +6,7 @@ import { serverSupabaseClient } from "#supabase/server"
  */
 export default eventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
+  const dozentId = getQuery(event).dozentID;
 
   // returns all data from the course with the specified id
   // @ts-ignore 
@@ -13,7 +14,10 @@ export default eventHandler(async (event) => {
 
   // returns all ratings for the course with the specified id using the sql query I defined in supabase
   // @ts-ignore
-  const { data: data_ratings } = await client.rpc("get_kurs_ratings", { p_kurs_id: event.context.params.id }).single();
+  const { data: data_ratings } = await client.rpc("get_kurs_ratings", {
+    p_kurs_id: event.context.params.id,
+    p_dozent_id: dozentId ? Number(dozentId) : null,
+  }).single();
 
   // returns all lecturers that teach the course with the specified id using a join query
 const { data: data_lecturers } = await client

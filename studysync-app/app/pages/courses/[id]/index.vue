@@ -4,11 +4,21 @@ import { ref, computed } from 'vue'
 // Url auslesen
 const route = useRoute()
 const urlId = route.params.id
+const dateiDozentFilter = ref('')
+const bewertungDozentFilter = ref('')
 
 // Daten laden
-const { data: course, refresh: refreshCourse } = await useFetch('/api/kurse/' + urlId)
+const { data: course, refresh: refreshCourse } = await useFetch('/api/kurse/' + urlId, {
+  query: computed(() => bewertungDozentFilter.value
+    ? { dozentID: bewertungDozentFilter.value }
+    : {})
+})
 const { data: forums, refresh: refreshForums } = await useFetch('/api/kurse/foren/' + urlId)
-const { data: files, refresh: refreshFiles } = await useFetch('/api/dateien/' + urlId)
+const { data: files, refresh: refreshFiles } = await useFetch('/api/dateien/' + urlId, {
+  query: computed(() => dateiDozentFilter.value
+    ? { dozentID: dateiDozentFilter.value }
+    : {})
+})
 
 // Bewertungskriterien für den zusammengefassten Kasten
 const bewertungsKriterien = computed(() => {
@@ -109,8 +119,8 @@ const { data: { publicUrl } } = supabase.storage.from('kurs_dateien').getPublicU
 const publicUrlBase = publicUrl.endsWith('/') ? publicUrl : publicUrl + '/'
 
 // 3. Tab-Steuerung
-const aktiverTab = ref('Probeklausuren')
-const tabs = ['Probeklausuren', 'Karteikarten', 'Mitschriften', 'Alle Ressourcen']
+const aktiverTab = ref('Alle')
+const tabs = ['Alle', 'Altklausuren', 'Skripte', 'Übungsaufgaben', 'Mitschriften']
 
 // Steuerung für die Bewertungs-Popups
 const zeigeKursBewertung = ref(false)
@@ -131,19 +141,12 @@ const kursBewertungStarten = async () => {
     return
   }
 
-  try {
-    const { alreadyRated } = await $fetch(`/api/kurse/bewertung/check?kursID=${urlId}`)
-
-    if (alreadyRated) {
-      bewertungsFehler.value = 'Du hast diesen Kurs bereits bewertet.'
-      return
-    }
-
-    zeigeKursBewertung.value = true
-  } catch (error) {
-    console.error('Fehler beim Prüfen der Kursbewertung:', error)
-    bewertungsFehler.value = 'Bewertung konnte nicht geprüft werden.'
+  if (dozentenListe.value.length === 0) {
+    bewertungsFehler.value = 'Zu diesem Kurs ist keine Lehrperson hinterlegt; eine Bewertung ist nicht möglich.'
+    return
   }
+
+  zeigeKursBewertung.value = true
 }
 // Prüfen, ob die Lehrperson bereits bewertet wurde
 const dozentBewertungStarten = async (dozentId) => {
@@ -218,9 +221,10 @@ const dozentenListe = computed(() => {
 
 // Dateien aus der API aufbereiten
 const formatDateityp = (dbTyp) => {
-  if (dbTyp === 'altklausur') return 'Probeklausuren'
-  if (dbTyp === 'loesung') return 'Lösungen'
+  if (dbTyp === 'skript') return 'Skripte'
+  if (dbTyp === 'uebungsaufgabe') return 'Übungsaufgaben'
   if (dbTyp === 'mitschrift') return 'Mitschriften'
+  if (dbTyp === 'altklausur') return 'Altklausuren'
   return dbTyp
 }
 
@@ -259,6 +263,7 @@ const materialien = computed(() => {
       name: item.dateiname || item.dateipfad.split('/').pop(),
       typ: formatDateityp(item.typ),
       autor: item.profile?.name || 'Nutzer',
+      dozent: dozentenListe.value.find((dozent) => Number(dozent.id) === Number(item.dozentID)),
       semester: item.semester || '',
       jahr: item.jahr || '',
       anzeigeSemester: formatiereSemesterUndJahr(item.semester, item.jahr),
@@ -279,7 +284,7 @@ const toggleSortierung = () => {
 
 const sortierteMaterialien = computed(() => {
   //Nach Tab filtern
-  let liste = materialien.value.filter(m => aktiverTab.value === 'Alle Ressourcen' || m.typ === aktiverTab.value);
+  let liste = materialien.value.filter(m => aktiverTab.value === 'Alle' || m.typ === aktiverTab.value);
 
   // Sortieren
   return liste.sort((a, b) => {
@@ -395,6 +400,25 @@ const toggleAbo = async () => {
                 </button>
               </NuxtLink>
 
+              <div class="mb-6 max-w-sm">
+                <label for="datei-dozent-filter" class="block text-sm font-bold text-slate-600 dark:text-gray-300 mb-2">
+                  Dateien von
+                </label>
+                <div class="relative">
+                  <select
+                    id="datei-dozent-filter"
+                    v-model="dateiDozentFilter"
+                    class="w-full appearance-none p-4 pr-12 rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-300"
+                  >
+                    <option value="">Alle Lehrenden</option>
+                    <option v-for="dozent in dozentenListe" :key="dozent.id" :value="String(dozent.id)">
+                      {{ dozent.vorname }} {{ dozent.nachname }}
+                    </option>
+                  </select>
+                  <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400 dark:text-gray-500">⌄</span>
+                </div>
+              </div>
+
               <!-- Tabs und Sortier-Buttoon -->
               <div class="flex items-center justify-between border-b border-slate-100 dark:border-gray-700 mb-6 pb-2">
                 <div class="flex overflow-x-auto gap-4">
@@ -445,6 +469,9 @@ const toggleAbo = async () => {
                         <span v-if="file.anzeigeSemester" class="text-blue-600 dark:text-blue-400 font-bold mr-2">
                           {{ file.anzeigeSemester }}
                         </span>
+                        <span v-if="file.dozent" class="font-bold mr-2">
+                          {{ file.dozent.vorname }} {{ file.dozent.nachname }}
+                        </span>
                         Uploaded by {{ file.autor }}, {{ file.datum }}
                       </p>
                     </div>
@@ -486,6 +513,25 @@ const toggleAbo = async () => {
             <p class="text-sm font-bold text-slate-400 dark:text-gray-500 mb-1">Kurs</p>
             <p class="font-bold text-slate-800 dark:text-gray-100 text-lg break-words whitespace-normal"
                style="overflow-wrap:anywhere; word-break:break-word;">{{ modulDaten.name }}</p>
+
+            <div class="mt-4">
+              <label for="bewertung-dozent-filter" class="block text-sm font-bold text-slate-500 dark:text-gray-400 mb-2">
+                Bewertungen von
+              </label>
+              <div class="relative">
+                <select
+                  id="bewertung-dozent-filter"
+                  v-model="bewertungDozentFilter"
+                  class="w-full appearance-none p-4 pr-12 rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-300"
+                >
+                  <option value="">Alle Lehrenden</option>
+                  <option v-for="dozent in dozentenListe" :key="dozent.id" :value="String(dozent.id)">
+                    {{ dozent.vorname }} {{ dozent.nachname }}
+                  </option>
+                </select>
+                <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400 dark:text-gray-500">⌄</span>
+              </div>
+            </div>
 
             <!-- Gesamtbewertung-->
             <div class="flex items-center gap-3 my-3">
@@ -731,6 +777,7 @@ const toggleAbo = async () => {
   <div v-if="zeigeKursBewertung" class="fixed inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <BewertungKurs
         :kursId="urlId"
+        :dozenten="dozentenListe"
         @abbrechen="zeigeKursBewertung = false"
         @gespeichert="zeigeKursBewertung = false; datenNeuLaden()"
     />

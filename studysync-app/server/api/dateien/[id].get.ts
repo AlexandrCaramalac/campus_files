@@ -5,9 +5,12 @@ import { serverSupabaseClient } from "#supabase/server"
  */
 export default eventHandler(async (event) => {
   const client = await serverSupabaseClient(event);
+  const dozentID = getQuery(event).dozentID;
 
   // @ts-ignore
-  const { data } = await client.from("dateien").select("*, profile(name)").eq("kursID", event.context.params.id);
+  let query = client.from("dateien").select("*, profile(name)").eq("kursID", event.context.params.id);
+  if (dozentID) query = query.eq("dozentID", Number(dozentID));
+  const { data } = await query;
   
   // @ts-ignore
   data?.sort((a, b) => b.jahr - a.jahr);

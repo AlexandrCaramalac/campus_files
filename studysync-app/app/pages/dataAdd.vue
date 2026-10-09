@@ -1,5 +1,5 @@
-<script setup>
-import { ref, onMounted } from 'vue';
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 // Lade Kurse für das Dropdown
@@ -7,9 +7,20 @@ const { data: kurseData, pending, error } = await useFetch('/api/kurse');
 
 const route = useRoute();
 
+const dateitypen = [
+  { value: 'skript', label: 'Skripte' },
+  { value: 'uebungsaufgabe', label: 'Übungsaufgaben' },
+  { value: 'mitschrift', label: 'Mitschriften' },
+  { value: 'altklausur', label: 'Altklausuren' },
+] as const;
+type DateiTyp = typeof dateitypen[number]['value'];
+
 // Formulardaten
 const selectedKurs = ref(null);
-const selectedTyp = ref('altklausur');
+const selectedDozent = ref('');
+const dozenten = ref([]);
+const dozentenError = ref('');
+const selectedTyp = ref<DateiTyp>('skript');
 const selectedSemester = ref('Sommersemester');
 const selectedJahr = ref(''); // Speichert nun ein volles Jahr (z.B. 2025)
 const selectedFile = ref(null);
@@ -27,14 +38,33 @@ onMounted(() => {
   }
 });
 
+watch(selectedKurs, async (kursId) => {
+  selectedDozent.value = '';
+  dozenten.value = [];
+  dozentenError.value = '';
+  if (!kursId) return;
+
+  try {
+    const kursData = await $fetch(`/api/kurse/${kursId}`);
+    if (String(selectedKurs.value) !== String(kursId)) return;
+    dozenten.value = (kursData.dozenten ?? [])
+      .map((entry) => entry.dozent)
+      .filter(Boolean);
+  } catch (error) {
+    if (String(selectedKurs.value) !== String(kursId)) return;
+    console.error('Fehler beim Laden der Lehrenden:', error);
+    dozentenError.value = 'Die Lehrenden für diesen Kurs konnten nicht geladen werden.';
+  }
+});
+
 function handleFileChange(event) {
   selectedFile.value = event.target.files[0];
 }
 
 async function uploadFile() {
-  if (!selectedFile.value || !selectedKurs.value || !selectedTyp.value || !selectedJahr.value || !selectedSemester.value) {
+  if (!selectedFile.value || !selectedKurs.value || !selectedDozent.value || !selectedTyp.value || !selectedJahr.value || !selectedSemester.value) {
     uploadStatus.value = 'error';
-    uploadMessage.value = 'Bitte alle Felder ausfüllen und eine Datei auswählen.';
+    uploadMessage.value = 'Bitte Kurs, Lehrperson, alle weiteren Felder und eine Datei auswählen.';
     return;
   }
 
@@ -51,6 +81,7 @@ async function uploadFile() {
 
   const formData = new FormData();
   formData.append('kursID', selectedKurs.value);
+  formData.append('dozentID', selectedDozent.value);
   formData.append('typ', selectedTyp.value);
   formData.append('semester', selectedSemester.value);
   formData.append('jahr', selectedJahr.value);
@@ -67,7 +98,8 @@ async function uploadFile() {
 
     // Formular vollständig zurücksetzen
     selectedKurs.value = null;
-    selectedTyp.value = 'altklausur';
+    selectedDozent.value = '';
+    selectedTyp.value = 'skript';
     selectedSemester.value = 'Sommersemester';
     selectedJahr.value = '';
     selectedFile.value = null;
@@ -150,6 +182,32 @@ async function uploadFile() {
               </p>
             </div>
 
+            <div>
+              <label class="block text-sm font-bold text-slate-600 mb-2">
+                Lehrperson
+              </label>
+              <div class="relative">
+                <select
+                  v-model="selectedDozent"
+                  class="w-full appearance-none p-4 pr-12 rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-300 disabled:opacity-60"
+                  required
+                  :disabled="!selectedKurs || dozenten.length === 0"
+                >
+                  <option value="" disabled>
+                    {{ !selectedKurs ? 'Bitte zuerst einen Kurs wählen...' : 'Bitte eine Lehrperson wählen...' }}
+                  </option>
+                  <option v-for="dozent in dozenten" :key="dozent.id" :value="String(dozent.id)">
+                    {{ dozent.vorname }} {{ dozent.nachname }}
+                  </option>
+                </select>
+                <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400 dark:text-gray-500">⌄</span>
+              </div>
+              <p v-if="dozentenError" class="text-red-500 text-sm mt-2">{{ dozentenError }}</p>
+              <p v-else-if="selectedKurs && dozenten.length === 0" class="text-red-500 text-sm mt-2">
+                Für diesen Kurs ist keine Lehrperson hinterlegt; Dateien können nicht zugeordnet werden.
+              </p>
+            </div>
+
             <!-- TYP -->
             <div>
               <label class="block text-sm font-bold text-slate-600 mb-2">
@@ -166,24 +224,12 @@ async function uploadFile() {
                   required
               >
                 <option
-                    value="altklausur"
+                    v-for="dateityp in dateitypen"
+                    :key="dateityp.value"
+                    :value="dateityp.value"
                     class="bg-white dark:bg-gray-800 text-slate-800 dark:text-gray-100"
                 >
-                  Probeklausuren
-                </option>
-
-                <option
-                    value="loesung"
-                    class="bg-white dark:bg-gray-800 text-slate-800 dark:text-gray-100"
-                >
-                  Karteikarten
-                </option>
-
-                <option
-                    value="mitschrift"
-                    class="bg-white dark:bg-gray-800 text-slate-800 dark:text-gray-100"
-                >
-                  Mitschriften
+                  {{ dateityp.label }}
                 </option>
               </select>
             </div>
