@@ -26,32 +26,35 @@ export default eventHandler(async (event) => {
   const fileData = multipartData?.find(el => el.name === 'file');
 
   // NEU: semesterData in die Prüfung aufgenommen
-  if (!kursIdData || !dozentIdData || !typData || !jahrData || !semesterData || !fileData || !fileData.filename) {
+  if (!kursIdData || !typData || !jahrData || !semesterData || !fileData || !fileData.filename) {
     throw createError({ 
       statusCode: 400, 
-      statusMessage: 'Bitte wähle Kurs und Lehrperson aus und gib Typ, Jahr, Semester sowie eine Datei an.'
+      statusMessage: 'Bitte wähle einen Kurs und gib Typ, Jahr, Semester sowie eine Datei an.'
     });
   } 
 
   const kursID = Number(kursIdData.data.toString());
-  const dozentID = Number(dozentIdData.data.toString());
-  if (!Number.isInteger(kursID) || kursID <= 0 || !Number.isInteger(dozentID) || dozentID <= 0) {
+  const dozentIdValue = dozentIdData?.data.toString().trim() ?? '';
+  const dozentID = dozentIdValue ? Number(dozentIdValue) : null;
+  if (!Number.isInteger(kursID) || kursID <= 0 || (dozentID !== null && (!Number.isInteger(dozentID) || dozentID <= 0))) {
     throw createError({ statusCode: 400, statusMessage: 'Kurs oder Lehrperson ist ungültig.' });
   }
 
-  const { data: unterrichtet, error: assignmentError } = await client
-    .from('unterrichtet')
-    .select('kursID')
-    .eq('kursID', kursID)
-    .eq('dozentID', dozentID)
-    .maybeSingle();
+  if (dozentID !== null) {
+    const { data: unterrichtet, error: assignmentError } = await client
+      .from('unterrichtet')
+      .select('kursID')
+      .eq('kursID', kursID)
+      .eq('dozentID', dozentID)
+      .maybeSingle();
 
-  if (assignmentError) {
-    console.error('Supabase assignment check error:', assignmentError);
-    throw createError({ statusCode: 500, statusMessage: 'Die Kurs-Lehrperson-Zuordnung konnte nicht geprüft werden.' });
-  }
-  if (!unterrichtet) {
-    throw createError({ statusCode: 400, statusMessage: 'Diese Lehrperson unterrichtet den ausgewählten Kurs nicht.' });
+    if (assignmentError) {
+      console.error('Supabase assignment check error:', assignmentError);
+      throw createError({ statusCode: 500, statusMessage: 'Die Kurs-Lehrperson-Zuordnung konnte nicht geprüft werden.' });
+    }
+    if (!unterrichtet) {
+      throw createError({ statusCode: 400, statusMessage: 'Diese Lehrperson unterrichtet den ausgewählten Kurs nicht.' });
+    }
   }
 
   const typ = typData.data.toString();

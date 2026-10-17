@@ -64,7 +64,7 @@ function handleFileChange(event) {
 async function uploadFile() {
   if (!selectedFile.value || !selectedKurs.value || !selectedDozent.value || !selectedTyp.value || !selectedJahr.value || !selectedSemester.value) {
     uploadStatus.value = 'error';
-    uploadMessage.value = 'Bitte Kurs, Lehrperson, alle weiteren Felder und eine Datei auswählen.';
+    uploadMessage.value = 'Bitte Kurs, Lehrperson-Auswahl, alle weiteren Felder und eine Datei auswählen.';
     return;
   }
 
@@ -81,7 +81,7 @@ async function uploadFile() {
 
   const formData = new FormData();
   formData.append('kursID', selectedKurs.value);
-  formData.append('dozentID', selectedDozent.value);
+  formData.append('dozentID', selectedDozent.value === 'none' ? '' : selectedDozent.value);
   formData.append('typ', selectedTyp.value);
   formData.append('semester', selectedSemester.value);
   formData.append('jahr', selectedJahr.value);
@@ -191,10 +191,13 @@ async function uploadFile() {
                   v-model="selectedDozent"
                   class="w-full appearance-none p-4 pr-12 rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 text-slate-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-300 disabled:opacity-60"
                   required
-                  :disabled="!selectedKurs || dozenten.length === 0"
+                  :disabled="!selectedKurs"
                 >
                   <option value="" disabled>
                     {{ !selectedKurs ? 'Bitte zuerst einen Kurs wählen...' : 'Bitte eine Lehrperson wählen...' }}
+                  </option>
+                  <option value="none">
+                    Keine Lehrperson zuweisen
                   </option>
                   <option v-for="dozent in dozenten" :key="dozent.id" :value="String(dozent.id)">
                     {{ dozent.vorname }} {{ dozent.nachname }}
@@ -203,8 +206,8 @@ async function uploadFile() {
                 <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-slate-400 dark:text-gray-500">⌄</span>
               </div>
               <p v-if="dozentenError" class="text-red-500 text-sm mt-2">{{ dozentenError }}</p>
-              <p v-else-if="selectedKurs && dozenten.length === 0" class="text-red-500 text-sm mt-2">
-                Für diesen Kurs ist keine Lehrperson hinterlegt; Dateien können nicht zugeordnet werden.
+              <p v-else-if="selectedKurs && dozenten.length === 0" class="text-slate-500 dark:text-gray-400 text-sm mt-2">
+                Für diesen Kurs ist keine Lehrperson hinterlegt. Du kannst die Datei ohne Zuordnung hochladen.
               </p>
             </div>
 
@@ -268,7 +271,7 @@ async function uploadFile() {
               <!-- Jahr -->
               <div>
                 <label class="block text-sm font-bold text-slate-600 mb-2">
-                  Jahr
+                  Jahr (bei WiSe das Startjahr)
                 </label>
                 <input
                     type="number"
